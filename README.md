@@ -300,6 +300,7 @@ TBD
 ## Task #9: OpenCL GELU Implementation
 TBD
 
+
 # Results
 ## 1_gelu_omp (67108864 elements)
 |Group|Name|Result|
@@ -330,5 +331,10 @@ TBD
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.4266|
+
+## 7_gemm_cublas (8192 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.7587|
 
 # Tasks Done
