@@ -261,7 +261,38 @@ std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
 ```
 
 ## Task #7: Matrix Multiplication using cuBLAS
-TBD
+The most performant way to multiply two matrices on particular hardware is to use vendor-provided library for this purpose. In CUDA it's [cuBLAS](https://docs.nvidia.com/cuda/cublas/index.html). Try to use cuBLAS API to implement general matrix multiplication in most performant way.
+
+Each matrix must be stored in a linear array by rows, so that `a.size()==n*n`. Function takes two matricies and their size as inputs, and returns result matrix also stored by rows.
+
+For simplicity, let's consider matrix size is always power of 2.
+
+Note, that in cuBLAS API matrix is expected to be stored by columns, so additional transpose may be required.
+
+Two files are expected to be uploaded:
+- gemm_cublas.h:
+```cpp
+#ifndef __GEMM_CUBLAS_H
+#define __GEMM_CUBLAS_H
+
+#include <vector>
+
+std::vector<float> GemmCUBLAS(const std::vector<float>& a,
+                              const std::vector<float>& b,
+                              int n);
+
+#endif // __GEMM_CUBLAS_H
+```
+- gemm_cublas.cu:
+```cpp
+#include "gemm_cublas.h"
+
+std::vector<float> GemmCUBLAS(const std::vector<float>& a,
+                              const std::vector<float>& b,
+                              int n) {
+    // Place your implementation here
+}
+```
 
 ## Task #8: FFT (Fast Fourier Transform) using cuFFT
 TBD
