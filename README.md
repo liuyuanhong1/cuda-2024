@@ -359,6 +359,7 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
 ## Task #9: OpenCL GELU Implementation
 TBD
 
+
 # Results
 ## 1_gelu_omp (134217728 elements)
 |Group|Name|Result|
@@ -394,5 +395,10 @@ TBD
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.3054|
+
+## 8_fft_cufft (131072 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.2309|
 
 # Tasks Done
