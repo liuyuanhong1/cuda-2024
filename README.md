@@ -314,7 +314,47 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
 ```
 
 ## Task #8: FFT (Fast Fourier Transform) using cuFFT
-TBD
+Another widely used operation in HPC & signal processing is discrete [Fourier Transform](https://en.wikipedia.org/wiki/Fourier_transform). Naive approach (by definition) has $O(n^2)$ complexity and is not used in practice due to its slowness. Better way is [Fast Fourier Transform (FFT)](https://en.wikipedia.org/wiki/Fast_Fourier_transform) algorithm with $O(n*log(n))$ complexity.
+
+Due to its frequent use, FFT algorithm implementation is normally a part of vendor-optimized solutions for various hardware chips. For NVIDIA GPUs one should take [cuFFT](https://docs.nvidia.com/cuda/cufft/index.html) library.
+
+To pass the task one should implement a funtion that takes $batch$ signals of $n$ complex elements, and performs complex-to-complex forward and than inverse Fourier transform for them. For better performance use cuFFT API.
+
+Required function should have the following prototype:
+```cpp
+std::vector<float> FffCUFFT(const std::vector<float>& input, int batch);
+```
+Here $batch$ is a number of independent signals, $input$ contains complex values in the format of $(real, imaginary)$ pairs of floats storing pair by pair. So $input$ array size must be equal to $2 * n * batch$.
+
+The function should perform the following actions:
+1. Compute forward Fourier transform for $input$;
+2. Compute inverse Fourier transform for the result of step 1;
+3. Normalize result of step 2 by $n$.
+
+Returned array must store result of step 3 in the same format of $(real, imaginary)$ pairs as $input$ and have the same size.
+
+Note, that due to Fourier Transform math properties, result array will have the same values as input one. This specificity could be used for self-checking.
+
+Two files are expected to be uploaded:
+- fft_cufft.h:
+```cpp
+#ifndef __FFT_CUFFT_H
+#define __FFT_CUFFT_H
+
+#include <vector>
+
+std::vector<float> FffCUFFT(const std::vector<float>& input, int batch);
+
+#endif // __FFT_CUFFT_H
+```
+- fft_cufft.cu:
+```cpp
+#include "fft_cufft.h"
+
+std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
+    // Place your implementation here
+}
+```
 
 ## Task #9: OpenCL GELU Implementation
 TBD
