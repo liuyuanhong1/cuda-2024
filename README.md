@@ -299,3 +299,41 @@ TBD
 
 ## Task #9: OpenCL GELU Implementation
 TBD
+
+# Results
+## 1_gelu_omp (134217728 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.8126|
+
+## 2_gelu_cuda (134217728 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.2598|
+
+## 3_naive_gemm_omp (1024 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.8379|
+
+## 4_naive_gemm_cuda (8192 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.1620|
+
+## 5_block_gemm_omp (1024 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.1980|
+
+## 6_block_gemm_cuda (8192 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.1650|
+
+## 7_gemm_cublas (8192 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.3054|
+
+# Tasks Done
