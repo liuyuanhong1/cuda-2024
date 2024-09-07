@@ -1,6 +1,7 @@
 # Content
 - [How To](#how-to)
 - [Configuration](#configuration)
+- [Time Measurement](#time-measurement)
 - [Tasks](#tasks)
 - [Results](#results)
 
@@ -36,6 +37,24 @@ cd ..
 git add .
 git commit -m "1_gelu_omp task"
 git push
+```
+
+# Time Measurement
+The following scheme is used to measure task execution time:
+```cpp
+int main() {
+    // ...
+
+    // Warming-up
+    Task(input, size / 8);
+
+    // Performance Measuring
+    auto start = std::chrono::high_resolution_clock::now();
+    auto c = Task(input, size);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // ...
+}
 ```
 
 # Configuration
