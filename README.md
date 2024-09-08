@@ -357,8 +357,34 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
 ```
 
 ## Task #9: OpenCL GELU Implementation
-TBD
+Implement GELU function with the following interface in OpenCL using the formula described in task #1:
+```cpp
+std::vector<float> GeluOCL(const std::vector<float>& input);
+```
+Size of result vector should be the same as for `input`. Use OpenCL technology to make your function work on NVIDIA GPU. Try to make it fast.
 
+Use `CL_DEVICE_GPU` flag to choose GPU device. Use zero platform and zero device. Store your OpenCL kernel in a string constant.
+
+Two files are expected to be uploaded:
+- gelu_ocl.h
+```cpp
+#ifndef __GELU_OCL_H
+#define __GELU_OCL_H
+
+#include <vector>
+
+std::vector<float> GeluOCL(const std::vector<float>& input);
+
+#endif // __GELU_OCL_H
+```
+- gelu_ocl.cpp
+```cpp
+#include "gelu_ocl.h"
+
+std::vector<float> GeluOCL(const std::vector<float>& input) {
+    // Place your implementation here
+}
+```
 
 # Results
 ## 1_gelu_omp (134217728 elements)
