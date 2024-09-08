@@ -427,4 +427,9 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |-----|----|------|
 |REF|REF|0.2309|
 
+## 9_gelu_ocl (134217728 elements)
+|Group|Name|Result|
+|-----|----|------|
+|REF|REF|0.2621|
+
 # Tasks Done
