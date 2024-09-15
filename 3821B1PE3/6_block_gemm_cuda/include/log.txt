@@ -1,1 +1,0 @@
-Source file /home/crazyproger/sandbox/cuda-2024/3821B1PE3/6_block_gemm_cuda/include/block_gemm_cuda.cu not found
