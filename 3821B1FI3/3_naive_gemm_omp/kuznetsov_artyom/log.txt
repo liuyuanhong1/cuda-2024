@@ -1,0 +1,47 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp: In function ‘std::vector<float> NaiveGemmOMP(const std::vector<float>&, const std::vector<float>&, int)’:
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:6:3: error: ‘size_t’ was not declared in this scope; did you mean ‘std::size_t’?
+    6 |   size_t i = 0;
+      |   ^~~~~~
+      |   std::size_t
+In file included from /usr/include/c++/11/bits/stl_algobase.h:59,
+                 from /usr/include/c++/11/vector:60,
+                 from /home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.h:4,
+                 from /home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:1:
+/usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h:280:33: note: ‘std::size_t’ declared here
+  280 |   typedef __SIZE_TYPE__         size_t;
+      |                                 ^~~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:7:9: error: expected ‘;’ before ‘j’
+    7 |   size_t j = 0;
+      |         ^~
+      |         ;
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:8:9: error: expected ‘;’ before ‘k’
+    8 |   size_t k = 0;
+      |         ^~
+      |         ;
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:10:33: error: ‘matrA’ has not been declared
+   10 | #pragma omp parallel for shared(matrA, matrB, matrC) private(m, n, k) \
+      |                                 ^~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:10:40: error: ‘matrB’ has not been declared
+   10 | #pragma omp parallel for shared(matrA, matrB, matrC) private(m, n, k) \
+      |                                        ^~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:10:47: error: ‘matrC’ has not been declared
+   10 | #pragma omp parallel for shared(matrA, matrB, matrC) private(m, n, k) \
+      |                                               ^~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:10:62: error: ‘m’ has not been declared
+   10 | #pragma omp parallel for shared(matrA, matrB, matrC) private(m, n, k) \
+      |                                                              ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:10:68: error: ‘k’ has not been declared
+   10 | #pragma omp parallel for shared(matrA, matrB, matrC) private(m, n, k) \
+      |                                                                    ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:12:8: error: ‘i’ was not declared in this scope
+   12 |   for (i = 0; i < n; ++i)
+      |        ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:13:10: error: ‘j’ was not declared in this scope
+   13 |     for (j = 0; j < n; ++j)
+      |          ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:14:12: error: ‘k’ was not declared in this scope
+   14 |       for (k = 0; k < n; ++k) c[i * n + j] += a[i * n + k] * b[n * k + j];
+      |            ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/3_naive_gemm_omp/kuznetsov_artyom/naive_gemm_omp.cpp:12:3: error: expected iteration declaration or initialization
+   12 |   for (i = 0; i < n; ++i)
+      |   ^~~

@@ -390,17 +390,20 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 1_gelu_omp (134217728 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1FI3|kuznetsov_artyom|0.2609|
 |REF|REF|0.8126|
 
 ## 2_gelu_cuda (134217728 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1FI3|kuznetsov_artyom|0.2407|
 |REF|REF|0.2598|
 
 ## 3_naive_gemm_omp (1024 elements)
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.8379|
+|3821B1FI3|kuznetsov_artyom|BUILD FAILED|
 
 ## 4_naive_gemm_cuda (8192 elements)
 |Group|Name|Result|
@@ -433,3 +436,8 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |REF|REF|0.2621|
 
 # Tasks Done
+## 3821B1FI3
+|Group|Name|Passed|
+|-----|----|------|
+|3821B1FI3|kuznetsov_artyom|2/9|
+
