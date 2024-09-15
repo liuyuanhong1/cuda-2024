@@ -4,6 +4,6 @@
 #include <vector>
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
-                                const std::vector<float>& b, int n);
+                                const std::vector<float>& b, int size);
 
 #endif  // __NAIVE_GEMM_OMP_H
