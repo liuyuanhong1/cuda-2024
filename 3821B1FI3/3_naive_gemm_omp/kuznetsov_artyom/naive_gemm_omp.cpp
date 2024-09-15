@@ -3,9 +3,9 @@
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                 const std::vector<float>& b, int size) {
   std::vector<float> c(size * size, 0.0f);
-  size_t m = 0;
-  size_t n = 0;
-  size_t k = 0;
+  std::size_t m = 0;
+  std::size_t n = 0;
+  std::size_t k = 0;
 
 #pragma omp parallel for shared(a, b, c) private(m, n, k) collapse(3)
   for (m = 0; m < size; ++m)
