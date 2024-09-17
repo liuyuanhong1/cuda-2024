@@ -8,24 +8,25 @@
 # How To
 1. Create [github](https://github.com/) account (if not exists);
 2. Make sure SSH clone & commit is working ([Connecting to GitHub with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh));
-3. Clone current repo into your local machine:
+3. Fork this repo (just click **Fork** button on the top of the page, detailed instructions [here](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project))
+4. Clone your forked repo into your local machine, use your user instead of `username`:
 ```sh
-git clone git@github.com:avgorshk/cuda-2024.git
+git clone git@github.com:username/cuda-2024.git
 cd cuda-2024
 ```
-4. Go to your group folder, e.g.:
+5. Go to your group folder, e.g.:
 ```sh
 cd 3821B1FI1
 ```
-5. Go to needed task folder, e.g.:
+6. Go to needed task folder, e.g.:
 ```sh
 cd 1_gelu_omp
 ```
-6. Create new folder with your surname and name (**make sure it's the same for all tasks**), e.g.:
+7. Create new folder with your surname and name (**make sure it's the same for all tasks**), e.g.:
 ```sh
 mkdir petrov_ivan
 ```
-7. Copy your task source/header files (including main program) into this folder, e.g.:
+8. Copy your task source/header files (including main program) into this folder (use `copy` instead of `cp` on Windows), e.g.:
 ```sh
 cd petrov_ivan
 cp /home/usr/lab/*.cpp .
@@ -38,6 +39,7 @@ git add .
 git commit -m "1_gelu_omp task"
 git push
 ```
+9. Go to your repo in browser, click **Contribute** button on the top of page, then **Open pull request**. Provide meaningfull request title and description, then **Create pull request** (see details [here](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)).
 
 # Time Measurement
 The following scheme is used to measure task execution time:
@@ -103,7 +105,7 @@ Implement the function with the following interface in CUDA C++ using the formul
 ```cpp
 std::vector<float> GeluCUDA(const std::vector<float>& input);
 ```
-Size of result vector should be the same as for `input`. Use CUDA technology to make your function working on NVIDIA GPU. Try to make it fast.
+Size of result vector should be the same as for `input`. Use CUDA technology to make your function work on NVIDIA GPU. Try to make it fast.
 
 Two files are expected to be uploaded:
 - gelu_cuda.h
@@ -140,6 +142,7 @@ std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                 int n);
 ```
 Each matrix must be stored in a linear array by rows, so that `a.size()==n*n`. Function takes two matricies and their size as inputs, and returns result matrix also stored by rows.
+
 For simplicity, let's consider matrix size is always power of 2.
 
 Two files are expected to be uploaded:
@@ -171,6 +174,7 @@ std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
 In this task one should implement naive approach for matrix multiplication in CUDA trying to make it fast enough *(pay attention to global memory accesses in your code)*.
 
 Each matrix must be stored in a linear array by rows, so that `a.size()==n*n`. Function takes two matricies and their size as inputs, and returns result matrix also stored by rows.
+
 For simplicity, let's consider matrix size is always power of 2.
 
 Two files are expected to be uploaded:
@@ -211,6 +215,7 @@ From math perspective, block matrix multiplication could be described by the fol
 $C_{IJ}=\sum_{k=1}^{block_count}A_{IK}B_{KJ}$
 
 Each matrix must be stored in a linear array by rows, so that `a.size()==n*n`. Function takes two matricies and their size as inputs, and returns result matrix also stored by rows.
+
 For simplicity, let's consider matrix size is always power of 2.
 
 Two files are expected to be uploaded:
@@ -252,6 +257,7 @@ In CUDA C++ block-based approach looks similar. But to get better performance on
 3. Dump block C from shared to global memory.
 
 Each matrix must be stored in a linear array by rows, so that `a.size()==n*n`. Function takes two matricies and their size as inputs, and returns result matrix also stored by rows.
+
 For simplicity, let's consider matrix size is always power of 2.
 
 Two files are expected to be uploaded:
@@ -440,4 +446,3 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |Group|Name|Passed|
 |-----|----|------|
 |3821B1FI3|kuznetsov_artyom|2/9|
-
