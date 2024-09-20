@@ -446,3 +446,4 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |Group|Name|Passed|
 |-----|----|------|
 |3821B1FI3|kuznetsov_artyom|2/9|
+
