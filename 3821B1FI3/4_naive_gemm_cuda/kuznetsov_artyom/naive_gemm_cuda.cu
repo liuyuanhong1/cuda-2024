@@ -18,6 +18,25 @@
     }                                                                     \
   }
 
+/**
+ *
+ * VERSION FOR RECTANGLE MATRIXS
+ *
+ * __global__ void naive_gemm_kernel(float *c, const float *a, const float *b,
+ *                                     const size_t m, const size_t k,
+ *                                     const size_t n) {
+ *   size_t iIdx = blockIdx.y * blockDim.y + threadIdx.y;
+ *   size_t jIdx = blockIdx.x * blockDim.x + threadIdx.x;
+ *
+ *   if (iIdx < m && jIdx < n) {
+ *     float resCell{};
+ *     for (size_t i = 0; i < k; ++i) resCell += a[iIdx * k + i] * b[n * i +
+ * jIdx]; c[iIdx * n + jIdx] = resCell;
+ *   }
+ * }
+ *
+ */
+
 __global__ void naive_gemm_kernel(float *c, const float *a, const float *b,
                                   const size_t size) {
   size_t iIdx = blockIdx.y * blockDim.y + threadIdx.y;
