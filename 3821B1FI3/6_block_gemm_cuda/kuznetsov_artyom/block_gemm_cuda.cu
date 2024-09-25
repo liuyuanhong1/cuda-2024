@@ -62,7 +62,7 @@
  *     c[iGlob * nSize + jGlob] = resCell;
  *   }
  * }
- * 
+ *
  */
 
 constexpr auto BLOCK_SIZE = 16;
