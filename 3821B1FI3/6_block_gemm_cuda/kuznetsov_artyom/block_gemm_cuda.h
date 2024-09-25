@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Kuznetsov-Artyom
 #ifndef __BLOCK_GEMM_CUDA_H
 #define __BLOCK_GEMM_CUDA_H
 

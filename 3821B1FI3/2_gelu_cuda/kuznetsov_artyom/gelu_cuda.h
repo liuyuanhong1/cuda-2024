@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Kuznetsov-Artyom
 #ifndef __GELU_CUDA_H
 #define __GELU_CUDA_H
 
