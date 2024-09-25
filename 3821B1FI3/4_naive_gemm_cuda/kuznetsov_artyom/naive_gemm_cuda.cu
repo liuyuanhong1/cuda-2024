@@ -31,8 +31,9 @@
  *
  *   if (iIdx < m && jIdx < n) {
  *     float resCell{};
- *     for (size_t i = 0; i < k; ++i) resCell += a[iIdx * k + i] * b[n * i +
- * jIdx]; c[iIdx * n + jIdx] = resCell;
+ *     for (size_t i = 0; i < k; ++i)
+ *       resCell += a[iIdx * k + i] * b[n * i + jIdx];
+ *     c[iIdx * n + jIdx] = resCell;
  *   }
  * }
  *
