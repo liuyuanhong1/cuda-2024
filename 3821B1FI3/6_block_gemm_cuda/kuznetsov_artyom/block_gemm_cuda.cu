@@ -34,6 +34,7 @@
  *   __shared__ float bShared[BLOCK_SIZE * BLOCK_SIZE];
  *   int numBlocks = (kSize + BLOCK_SIZE - 1) / BLOCK_SIZE;
  *   float resCell{};
+ *
  *   for (int i = 0; i < numBlocks; ++i) {
  *     if (iGlob < mSize && i * BLOCK_SIZE + jLoc < kSize) {
  *       aShared[iLoc * BLOCK_SIZE + jLoc] =
@@ -73,9 +74,10 @@ __global__ void block_gemm_kernel(float *c, const float *a, const float *b,
 
   __shared__ float aShared[BLOCK_SIZE * BLOCK_SIZE];
   __shared__ float bShared[BLOCK_SIZE * BLOCK_SIZE];
+  int numBlocks = gridDim.x;
   float resCell{};
 
-  for (int i = 0; i < gridDim.x; ++i) {
+  for (int i = 0; i < numBlocks; ++i) {
     aShared[iLoc * BLOCK_SIZE + jLoc] = a[iGlob * size + i * BLOCK_SIZE + jLoc];
     bShared[iLoc * BLOCK_SIZE + jLoc] =
         b[i * BLOCK_SIZE * size + iLoc * size + jGlob];
