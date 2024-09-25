@@ -51,9 +51,9 @@
  *     }
  *
  *     __syncthreads();
- *     for (int i = 0; i < BLOCK_SIZE; ++i) {
+ *     for (int j = 0; j < BLOCK_SIZE; ++j) {
  *       resCell +=
- *           aShared[iLoc * BLOCK_SIZE + i] * bShared[i * BLOCK_SIZE + jLoc];
+ *           aShared[iLoc * BLOCK_SIZE + j] * bShared[j * BLOCK_SIZE + jLoc];
  *     }
  *     __syncthreads();
  *   }
