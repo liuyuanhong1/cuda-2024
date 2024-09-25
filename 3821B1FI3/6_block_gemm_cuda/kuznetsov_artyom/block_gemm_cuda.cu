@@ -18,6 +18,50 @@
     }                                                                     \
   }
 
+/**
+ *
+ * VERSION FOR RECTANGLE MATRIXS
+ *
+ * __global__ void matmul_block_kernel(float *c, const float *a, const float *b,
+ *                                     const size_t mSize, const size_t kSize,
+ *                                     const size_t nSize) {
+ *   size_t iGlob = blockIdx.y * BLOCK_SIZE + threadIdx.y;
+ *   size_t jGlob = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+ *   size_t iLoc = threadIdx.y;
+ *   size_t jLoc = threadIdx.x;
+ *
+ *   __shared__ float aShared[BLOCK_SIZE * BLOCK_SIZE];
+ *   __shared__ float bShared[BLOCK_SIZE * BLOCK_SIZE];
+ *   int numBlocks = (kSize + BLOCK_SIZE - 1) / BLOCK_SIZE;
+ *   float resCell{};
+ *   for (int i = 0; i < numBlocks; ++i) {
+ *     if (iGlob < mSize && i * BLOCK_SIZE + jLoc < kSize) {
+ *       aShared[iLoc * BLOCK_SIZE + jLoc] =
+ *           a[iGlob * kSize + i * BLOCK_SIZE + jLoc];
+ *     } else {
+ *       aShared[iLoc * BLOCK_SIZE + jLoc] = 0.0f;
+ *     }
+ *
+ *     if (jGlob < nSize && i * BLOCK_SIZE + iLoc < kSize) {
+ *       bShared[iLoc * BLOCK_SIZE + jLoc] =
+ *           b[i * BLOCK_SIZE * nSize + iLoc * nSize + jGlob];
+ *     } else {
+ *       bShared[iLoc * BLOCK_SIZE + jLoc] = 0.0f;
+ *     }
+ *
+ *     __syncthreads();
+ *     for (int i = 0; i < BLOCK_SIZE; ++i) {
+ *       resCell +=
+ *           aShared[iLoc * BLOCK_SIZE + i] * bShared[i * BLOCK_SIZE + jLoc];
+ *     }
+ *     __syncthreads();
+ *   }
+ *
+ *   if (iGlob < mSize && jGlob < nSize) {
+ *     c[iGlob * nSize + jGlob] = resCell;
+ *   }
+ */
+
 constexpr auto BLOCK_SIZE = 16;
 
 __global__ void block_gemm_kernel(float *c, const float *a, const float *b,
@@ -37,12 +81,10 @@ __global__ void block_gemm_kernel(float *c, const float *a, const float *b,
         b[i * BLOCK_SIZE * size + iLoc * size + jGlob];
 
     __syncthreads();
-
     for (int j = 0; j < BLOCK_SIZE; ++j) {
       resCell +=
           aShared[iLoc * BLOCK_SIZE + j] * bShared[j * BLOCK_SIZE + jLoc];
     }
-
     __syncthreads();
   }
 
