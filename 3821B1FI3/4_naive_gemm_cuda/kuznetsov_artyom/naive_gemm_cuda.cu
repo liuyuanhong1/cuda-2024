@@ -62,7 +62,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float> &a,
 
   std::vector<float> cHost(size * size);
   auto countBytes = countElem * sizeof(float);
-  auto sizeAxis = 8;
+  constexpr auto sizeAxis = 8;
   dim3 threadsPerBlock(sizeAxis, sizeAxis);
   dim3 numBlocks(cdiv(size, sizeAxis), cdiv(size, sizeAxis));
 
