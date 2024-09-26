@@ -66,7 +66,7 @@
  *
  */
 
-constexpr auto BLOCK_SIZE = 16;
+constexpr auto BLOCK_SIZE = 32;
 
 __global__ void block_gemm_kernel(float *c, const float *a, const float *b,
                                   const size_t size) {

@@ -39,6 +39,8 @@
  *
  */
 
+constexpr auto BLOCK_SIZE = 32;
+
 __global__ void naive_gemm_kernel(float *c, const float *a, const float *b,
                                   const size_t size) {
   size_t iIdx = blockIdx.y * blockDim.y + threadIdx.y;
@@ -64,7 +66,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float> &a,
 
   std::vector<float> cHost(size * size);
   auto countBytes = countElem * sizeof(float);
-  constexpr auto sizeAxis = 8;
+  constexpr auto sizeAxis = BLOCK_SIZE;
   dim3 threadsPerBlock(sizeAxis, sizeAxis);
   dim3 numBlocks(cdiv(size, sizeAxis), cdiv(size, sizeAxis));
 
