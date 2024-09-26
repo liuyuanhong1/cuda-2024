@@ -3,7 +3,7 @@
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                 const std::vector<float>& b, int size) {
-  if (a.size() != size * size || b.size() != size * size) return {};
+  if (a.size() != size * size || b.size() != size * size) return std::vector<float>();
 
   std::vector<float> c(size * size, 0.0f);
   std::size_t m = 0;
