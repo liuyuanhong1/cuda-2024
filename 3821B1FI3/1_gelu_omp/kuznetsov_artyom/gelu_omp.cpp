@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Kuznetsov-Artyom
 #include "gelu_omp.h"
 
 #include <cmath>

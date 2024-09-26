@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Kuznetsov-Artyom
 #include <iostream>
 #include <cstdlib>
 

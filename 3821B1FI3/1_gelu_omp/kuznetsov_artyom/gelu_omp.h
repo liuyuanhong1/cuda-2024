@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Kuznetsov-Artyom
 #ifndef __GELU_OMP_H
 #define __GELU_OMP_H
 
