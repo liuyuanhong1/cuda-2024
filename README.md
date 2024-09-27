@@ -425,8 +425,8 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 6_block_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1FI3|kuznetsov_artyom|0.1516|
 |REF|REF|0.1524|
-|3821B1FI3|kuznetsov_artyom|1.0601|
 
 ## 7_gemm_cublas (4096 elements)
 |Group|Name|Result|
