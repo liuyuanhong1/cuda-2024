@@ -411,10 +411,10 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |REF|REF|0.8379|
 |3821B1FI3|kuznetsov_artyom|0.9003|
 
-## 4_naive_gemm_cuda (8192 elements)
+## 4_naive_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
-|REF|REF|0.1620|
+|REF|REF|0.1877|
 |3821B1FI3|kuznetsov_artyom|TOO SLOW|
 
 ## 5_block_gemm_omp (1024 elements)
@@ -422,16 +422,16 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |-----|----|------|
 |REF|REF|0.1980|
 
-## 6_block_gemm_cuda (8192 elements)
+## 6_block_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
-|REF|REF|0.1650|
+|REF|REF|0.1524|
 |3821B1FI3|kuznetsov_artyom|1.0601|
 
-## 7_gemm_cublas (8192 elements)
+## 7_gemm_cublas (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
-|REF|REF|0.3054|
+|REF|REF|0.0601|
 
 ## 8_fft_cufft (131072 elements)
 |Group|Name|Result|
