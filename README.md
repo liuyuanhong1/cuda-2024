@@ -408,14 +408,14 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3_naive_gemm_omp (1024 elements)
 |Group|Name|Result|
 |-----|----|------|
-|3821B1FI3|kuznetsov_artyom|0.6781|
 |REF|REF|0.8379|
+|3821B1FI3|kuznetsov_artyom|0.9010|
 
 ## 4_naive_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.1877|
-|3821B1FI3|kuznetsov_artyom|0.2378|
+|3821B1FI3|kuznetsov_artyom|0.2329|
 
 ## 5_block_gemm_omp (1024 elements)
 |Group|Name|Result|
