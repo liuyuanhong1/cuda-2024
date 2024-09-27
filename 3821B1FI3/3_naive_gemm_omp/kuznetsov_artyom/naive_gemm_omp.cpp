@@ -3,9 +3,10 @@
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                 const std::vector<float>& b, int size) {
-  if (a.size() != size * size || b.size() != size * size) return {};
+  std::size_t countElem = size * size;
+  if (a.size() != countElem || b.size() != countElem) return {};
 
-  std::vector<float> c(size * size, 0.0f);
+  std::vector<float> c(countElem, 0.0f);
   std::size_t m = 0;
   std::size_t n = 0;
   std::size_t k = 0;

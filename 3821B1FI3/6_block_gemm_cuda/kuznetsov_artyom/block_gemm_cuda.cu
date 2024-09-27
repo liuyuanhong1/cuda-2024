@@ -105,7 +105,7 @@ std::vector<float> BlockGemmCUDA(const std::vector<float> &a,
   cudaDeviceProp deviceProp{};
   CHECK_CUDA_ERROR(cudaGetDeviceProperties(&deviceProp, 0));
 
-  auto countElem = size * size;
+  size_t countElem = size * size;
   if (a.size() != countElem || b.size() != countElem) return {};
 
   std::vector<float> cHost(countElem);
