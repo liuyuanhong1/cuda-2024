@@ -61,10 +61,10 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float> &a,
   cudaDeviceProp deviceProp{};
   CHECK_CUDA_ERROR(cudaGetDeviceProperties(&deviceProp, 0));
 
-  auto countElem = size * size;
-  if (a.size() != size * size || b.size() != size * size) return {};
+  size_t countElem = size * size;
+  if (a.size() != countElem || b.size() != countElem) return {};
 
-  std::vector<float> cHost(size * size);
+  std::vector<float> cHost(countElem);
   auto countBytes = countElem * sizeof(float);
   constexpr auto sizeAxis = BLOCK_SIZE;
   dim3 threadsPerBlock(sizeAxis, sizeAxis);
@@ -87,6 +87,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float> &a,
 
   naive_gemm_kernel<<<numBlocks, threadsPerBlock>>>(cDev, aDev, bDev, size);
   CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+  CHECK_CUDA_ERROR(cudaGetLastError());
 
   CHECK_CUDA_ERROR(cudaMemcpy(reinterpret_cast<void *>(cHost.data()),
                               reinterpret_cast<void *>(cDev), countBytes,

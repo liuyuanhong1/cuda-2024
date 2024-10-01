@@ -1,6 +1,6 @@
 // Copyright (c) 2024 Kuznetsov-Artyom
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 #include "cuda.h"
 #include "cuda_runtime.h"
@@ -63,6 +63,7 @@ std::vector<float> GeluCUDA(const std::vector<float> &input) {
 
   gelu_kernel<<<numBlocks, threadsPerBlock>>>(outDev, inpDev, size);
   CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+  CHECK_CUDA_ERROR(cudaGetLastError());
 
   CHECK_CUDA_ERROR(cudaMemcpy(reinterpret_cast<void *>(output.data()),
                               reinterpret_cast<void *>(outDev), countBytes,
