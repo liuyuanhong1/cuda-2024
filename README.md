@@ -398,6 +398,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |-----|----|------|
 |3821B1FI3|kuznetsov_artyom|0.2679|
 |REF|REF|0.8126|
+|3821B1FI3|kulaev_zhenya|TOO SLOW|
 
 ## 2_gelu_cuda (134217728 elements)
 |Group|Name|Result|
@@ -449,5 +450,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3821B1FI3
 |Group|Name|Passed|
 |-----|----|------|
+|3821B1FI3|kulaev_zhenya|0/9|
 |3821B1FI3|kuznetsov_artyom|6/9|
 
