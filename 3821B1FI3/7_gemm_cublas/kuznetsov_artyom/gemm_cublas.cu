@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "block_gemm_cuda.h"
 #include "cublas_v2.h"
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
+#include "gemm_cublas.h"
 
 #define CHECK_CUDA_ERROR(callable)                                        \
   {                                                                       \
