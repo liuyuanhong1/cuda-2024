@@ -421,6 +421,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.1980|
+|3821B1FI3|kuznetsov_artyom|0.2230|
 
 ## 6_block_gemm_cuda (4096 elements)
 |Group|Name|Result|
@@ -432,6 +433,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |Group|Name|Result|
 |-----|----|------|
 |REF|REF|0.0601|
+|3821B1FI3|kuznetsov_artyom|BUILD FAILED|
 
 ## 8_fft_cufft (131072 elements)
 |Group|Name|Result|
@@ -447,5 +449,5 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3821B1FI3
 |Group|Name|Passed|
 |-----|----|------|
-|3821B1FI3|kuznetsov_artyom|5/9|
+|3821B1FI3|kuznetsov_artyom|6/9|
 
