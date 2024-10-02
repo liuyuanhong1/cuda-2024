@@ -1,4 +1,4 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1FI3/7_gemm_cublas/kuznetsov_artyom/gemm_cublas.cu:5:10: fatal error: block_gemm_cuda.h: No such file or directory
-    5 | #include "block_gemm_cuda.h"
-      |          ^~~~~~~~~~~~~~~~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/7_gemm_cublas/kuznetsov_artyom/gemm_cublas.cu:9:10: fatal error: gemm_cublas.h_: No such file or directory
+    9 | #include "gemm_cublas.h_"
+      |          ^~~~~~~~~~~~~~~~
 compilation terminated.
