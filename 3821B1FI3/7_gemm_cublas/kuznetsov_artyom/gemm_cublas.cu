@@ -6,7 +6,7 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "gemm_cublas.h_"
+#include "gemm_cublas.h"
 
 #define CHECK_CUDA_ERROR(callable)                                        \
   {                                                                       \
