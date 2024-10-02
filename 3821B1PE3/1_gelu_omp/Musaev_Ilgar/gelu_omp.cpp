@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-const float kTwoOverPi = 2.0f / M_PI; 
+const float kTwoOverPi = sqrt(2.0f / M_PI); 
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
   size_t size = input.size();
