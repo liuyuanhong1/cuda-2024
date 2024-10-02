@@ -14,7 +14,7 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
 #pragma omp parallel for
   for (size_t i = 0; i < input.size(); i++) {
     float x = input[i];
-    float tanh_arg = constTwo * (x + constOne * std::pow(x, 3));
+    float tanh_arg = constTwo * (x + constOne * (x * x * x));
     output[i] = 0.5 * x * (1.0 + std::tanh(tanh_arg));
   }
 
