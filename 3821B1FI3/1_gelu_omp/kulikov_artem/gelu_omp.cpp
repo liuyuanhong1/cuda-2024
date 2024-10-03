@@ -9,11 +9,12 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
   const size_t sz = input.size();
   std::vector<float> output(sz);
 
-  const float isqrt2 = 1.0f / sqrtf(2.0f);
+  const float c = 0.044715f;
+  const float dsqrt2ipi = 1.59577f;  // 2 * sqrt(2 / PI)
 
 #pragma omp parallel for
   for (size_t i = 0; i < sz; i++) {
-    output[i] = 0.5f * input[i] * (1.0f + erff(input[i] * isqrt2));
+    output[i] = input[i] / (1.0f + std::exp(-dsqrt2ipi * (input[i] + c * input[i] * input[i] * input[i])));
   }
 
   return output;
