@@ -37,6 +37,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
     
     cudaMemcpy(d_a, a.data(), sizeInBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), sizeInBytes, cudaMemcpyHostToDevice);
+    cudaMemset(*(void**)&d_c, 0, sizeInBytes);
     
     const size_t sizeAxis = 64u;
     dim3 threadsPerBlock(
