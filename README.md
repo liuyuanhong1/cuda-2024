@@ -40,6 +40,7 @@ git commit -m "1_gelu_omp task"
 git push
 ```
 9. Go to your repo in browser, click **Contribute** button on the top of page, then **Open pull request**. Provide meaningfull request title and description, then **Create pull request** (see details [here](https://docs.github.com/en/get-started/exploring-projects-on-github/contributing-to-a-project)).
+10. Go to Pull Requests [page](https://github.com/avgorshk/cuda-2024/pulls) in course repo, find your pull request and check if there are no any merge conflicts occur. If merge conflicts happen - resolve it following the instruction provided by github.
 
 # Time Measurement
 The following scheme is used to measure task execution time:
