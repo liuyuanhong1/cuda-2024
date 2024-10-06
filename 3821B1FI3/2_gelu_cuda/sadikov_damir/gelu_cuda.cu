@@ -17,7 +17,7 @@ std::vector<float> GeluCUDA(const std::vector<float>& input) {
 	int device;
 	cudaGetDevice(&device);
 	cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, device);
+	cudaGetDeviceProperties(&deviceProp, device);
 	int threadsPerBlock = deviceProp.maxThreadsPerBlock;
 	int blockNum = (input.size() + threadsPerBlock - 1) / threadsPerBlock;
 	
