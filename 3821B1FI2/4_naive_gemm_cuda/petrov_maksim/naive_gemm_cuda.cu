@@ -10,37 +10,15 @@ void checkCudaError(cudaError_t err, const char* msg) {
 
 const int TILE_SIZE = 32;
 
-__global__ void gemm_kernel_shared(const float* a, const float* b, float* c, int n) {
-    __shared__ float tile_a[TILE_SIZE][TILE_SIZE];
-    __shared__ float tile_b[TILE_SIZE][TILE_SIZE];
-
-    int row = blockIdx.y * TILE_SIZE + threadIdx.y;
-    int col = blockIdx.x * TILE_SIZE + threadIdx.x;
-    float sum = 0.0f;
-
-    for (int k = 0; k < (n + TILE_SIZE - 1) / TILE_SIZE; ++k) {
-        if (row < n && (k * TILE_SIZE + threadIdx.x) < n) {
-            tile_a[threadIdx.y][threadIdx.x] = a[row * n + (k * TILE_SIZE + threadIdx.x)];
-        }
-        else {
-            tile_a[threadIdx.y][threadIdx.x] = 0.0f;
-        }
-
-        if (col < n && (k * TILE_SIZE + threadIdx.y) < n) {
-            tile_b[threadIdx.y][threadIdx.x] = b[(k * TILE_SIZE + threadIdx.y) * n + col];
-        }
-        else {
-            tile_b[threadIdx.y][threadIdx.x] = 0.0f;
-        }
-        __syncthreads();
-    
-        for (int t = 0; t < TILE_SIZE; ++t) {
-            sum += tile_a[threadIdx.y][t] * tile_b[t][threadIdx.x];
-        }
-      
-    }
+__global__ void gemm_kernel(const float* a, const float* b, float* c, int n) {
+    int row = blockIdx.y * blockDim.y + threadIdx.y; 
+    int col = blockIdx.x * blockDim.x + threadIdx.x; 
 
     if (row < n && col < n) {
+        float sum = 0.0f;
+        for (int k = 0; k < n; ++k) {
+            sum += a[row * n + k] * b[k * n + col];
+        }
         c[row * n + col] = sum;
     }
 }
@@ -62,7 +40,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a, const std::vector<
     dim3 threadsPerBlock(TILE_SIZE, TILE_SIZE);
     dim3 numBlocks((n + TILE_SIZE - 1) / TILE_SIZE, (n + TILE_SIZE - 1) / TILE_SIZE);
 
-    gemm_kernel_shared << <numBlocks, threadsPerBlock >> > (d_a, d_b, d_c, n);
+    gemm_kernel << <numBlocks, threadsPerBlock >> > (d_a, d_b, d_c, n);
     checkCudaError(cudaGetLastError(), "Error when starting the kernel");
 
     checkCudaError(cudaDeviceSynchronize(), "Synchronization error");
