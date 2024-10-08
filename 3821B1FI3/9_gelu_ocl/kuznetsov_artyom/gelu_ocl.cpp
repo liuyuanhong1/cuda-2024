@@ -35,7 +35,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
   cl::Context context(device);
   cl::CommandQueue queue(context);
 
-  const std::string codeKernel = R"(
+  std::string codeKernel = R"(
 __kernel void gelu_kernel(__global const float* x, __global float* y, int countElem) {
   int i = get_global_id(0);
 
@@ -48,7 +48,7 @@ __kernel void gelu_kernel(__global const float* x, __global float* y, int countE
 )";
 
   cl::Program::Sources sources;
-  sources.emplace_back(codeKernel);
+  sources.emplace_back(std::move(codeKernel));
 
   cl::Program program(context, sources);
   if (program.build() != CL_SUCCESS) {
