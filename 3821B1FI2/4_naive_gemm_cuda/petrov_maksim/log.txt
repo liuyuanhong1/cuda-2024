@@ -1,0 +1,9 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/petrov_maksim/naive_gemm_cuda.cu(6): error: namespace "std" has no member "cerr"
+          std::cerr << "Error: " << msg << " - " << cudaGetErrorString(err) << std::endl;
+               ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/petrov_maksim/naive_gemm_cuda.cu(6): error: namespace "std" has no member "endl"
+          std::cerr << "Error: " << msg << " - " << cudaGetErrorString(err) << std::endl;
+                                                                                    ^
+
+2 errors detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/petrov_maksim/naive_gemm_cuda.cu".
