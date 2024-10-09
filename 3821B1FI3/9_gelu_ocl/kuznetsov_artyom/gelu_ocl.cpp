@@ -1,8 +1,8 @@
 // Copyright (c) 2024 Kuznetsov-Artyom
-#include "gelu_ocl.h"
-
 #include <CL/opencl.hpp>
 #include <iostream>
+
+#include "gelu_ocl.h"
 
 #define CHECK_CL_ERROR(callable)                                          \
   {                                                                       \
@@ -59,12 +59,13 @@ __kernel void gelu_kernel(__global const float* x, __global float* y, int countE
 
   if (input.empty()) return {};
   auto size = input.size();
+  auto countBytes = size * sizeof(float);
 
-  cl::Buffer bufferInput(context, CL_MEM_READ_ONLY, sizeof(float) * size);
-  cl::Buffer bufferOutput(context, CL_MEM_WRITE_ONLY, sizeof(float) * size);
+  cl::Buffer bufferInput(context, CL_MEM_READ_ONLY, countBytes);
+  cl::Buffer bufferOutput(context, CL_MEM_WRITE_ONLY, countBytes);
 
-  CHECK_CL_ERROR(queue.enqueueWriteBuffer(bufferInput, CL_TRUE, 0,
-                                          sizeof(float) * size, input.data()));
+  CHECK_CL_ERROR(queue.enqueueWriteBuffer(bufferInput, CL_TRUE, 0, countBytes,
+                                          input.data()));
 
   cl::Kernel kernel(program, "gelu_kernel");
   kernel.setArg(0, bufferInput);
@@ -74,8 +75,8 @@ __kernel void gelu_kernel(__global const float* x, __global float* y, int countE
                                             cl::NDRange(size), cl::NullRange));
 
   std::vector<float> output(size);
-  CHECK_CL_ERROR(queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0,
-                                         sizeof(float) * size, output.data()));
+  CHECK_CL_ERROR(queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, countBytes,
+                                         output.data()));
 
   return output;
 }
