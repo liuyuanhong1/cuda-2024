@@ -1,4 +1,5 @@
 #include <cuda_runtime.h>
+#include <iostream>
 #include "block_gemm_cuda.h"
 
 void checkCudaError(cudaError_t err, const char* msg) {
