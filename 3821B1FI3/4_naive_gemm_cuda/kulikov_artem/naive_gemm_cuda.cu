@@ -8,17 +8,13 @@
 __global__ void myKernel(const float *a, const float *b,
                             float *const c, const size_t size) {
   size_t mIdx = blockIdx.y * blockDim.y + threadIdx.y;
-  size_t kIdx = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t nIdx = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (mIdx < size && kIdx < size) {
-    float *const c_ = &c[mIdx * size]; 
-    float const cnst = a[mIdx * size + kIdx];
-    const float *const b_ = &b[size * kIdx];
-
-    for (int n = 0; n < size; n+=2) {
-        c_[n] += cnst * b_[n];
-        c_[n+1] += cnst * b_[n+1];
-    }
+  if (mIdx < size && nIdx < size) {
+    float cVal = 0.0f;
+    for (size_t k = 0; k < size; ++k)
+        cVal += a[mIdx * size + k] * b[size * k + nIdx];
+    c[mIdx * size + nIdx] = cVal;
   }
 }
 
@@ -37,7 +33,6 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
     
     cudaMemcpy(d_a, a.data(), sizeInBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), sizeInBytes, cudaMemcpyHostToDevice);
-    cudaMemset(*(void**)&d_c, 0, sizeInBytes);
     
     const size_t sizeAxis = 64u;
     dim3 threadsPerBlock(
