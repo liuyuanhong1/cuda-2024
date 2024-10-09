@@ -1,8 +1,8 @@
 // Copyright (c) 2024 Kuznetsov-Artyom
+#include "gelu_ocl.h"
+
 #include <CL/opencl.hpp>
 #include <iostream>
-
-#include "gelu_ocl.h"
 
 #define CHECK_CL_ERROR(callable)                                          \
   {                                                                       \
