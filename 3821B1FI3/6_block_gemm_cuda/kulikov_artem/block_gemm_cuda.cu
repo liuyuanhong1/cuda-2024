@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <vector>
 
-#define BLOCK_SIZE 64
+#define BLOCK_SIZE 32
 
 __global__ void myKernel(const float* a, const float* b,
                          float* const c, const int size) {
@@ -24,11 +24,11 @@ __global__ void myKernel(const float* a, const float* b,
 
     for (int t = 0; t < size / BLOCK_SIZE; ++t) {
         aCached[ty][tx] = a[nIdx * size + t * BLOCK_SIZE + tx];
-        bCached[tx][ty] = b[(t * BLOCK_SIZE + ty) * size + mIdx];
+        bCached[ty][tx] = b[(t * BLOCK_SIZE + ty) * size + mIdx];
 
         __syncthreads();
         for (int k = 0; k < BLOCK_SIZE; ++k) {
-            cVal += aCached[ty][k] * bCached[tx][k];
+            cVal += aCached[ty][k] * bCached[k][tx];
         }
         __syncthreads();
     }
