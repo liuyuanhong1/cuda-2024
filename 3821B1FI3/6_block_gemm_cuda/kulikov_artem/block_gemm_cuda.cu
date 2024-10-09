@@ -7,7 +7,7 @@
 #include <cstdlib>
 #include <vector>
 
-#define BLOCK_SIZE 64
+#define BLOCK_SIZE 32
 
 __global__ void myKernel(const float* a, const float* b,
                          float* const c, const int size) {
