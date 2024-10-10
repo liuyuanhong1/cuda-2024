@@ -39,7 +39,7 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
   size_t input_size = input.size();
   std::vector<float> gelu_result(input_size);
 
-  double x{};
+  float x{};
 
 #pragma omp parallel for simd private(x)
   for (size_t i = 0; i < input_size; ++i) {
