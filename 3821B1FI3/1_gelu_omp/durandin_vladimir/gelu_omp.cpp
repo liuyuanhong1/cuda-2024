@@ -1,10 +1,8 @@
 // Copyright (c) 2024 Durandin Vladimir
 
 #include "gelu_omp.h"
-#include <chrono>
+
 #include <cmath>
-#include <iostream>
-#include <omp.h>
 
 // ----
 
@@ -51,25 +49,4 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
         (1.0f + fast_tanh(sqrt_2_div_pi * (x + 0.044715f * x * x * x)));
   }
   return gelu_result;
-}
-
-int main() {
-
-  std::vector<float> test(134217728);
-  for (auto &val : test) {
-    val = static_cast<float>(std::rand()) /
-          RAND_MAX; // Случайное число в диапазоне [0, 1)
-  }
-  auto start = std::chrono::high_resolution_clock::now();
-  // for (int i = 0; i < 1000; ++i) {
-    GeluOMP(test);
-  // }
-  auto end = std::chrono::high_resolution_clock::now();
-
-  std::chrono::duration<double> duration = end - start;
-  // std::chrono::duration<double, std::milli> duration = end - start;
-
-  std::cout << "Time of execution: " << duration.count() << " milli "
-            << std::endl;
-  return 0;
 }
