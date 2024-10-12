@@ -34,7 +34,7 @@ float fast_tanh(float x) {
 std::vector<float> GeluOMP(const std::vector<float> &input) {
   
   std::vector<float> result(input.size());
-  constexpr float sqrt2_pi = std::sqrt(2 / 3.141592f);
+  constexpr float sqrt2_pi = 0.797885f;
   constexpr float coeff = 0.044715f;
   #pragma omp parallel for
   for(size_t i = 0;i < result.size();++i){
