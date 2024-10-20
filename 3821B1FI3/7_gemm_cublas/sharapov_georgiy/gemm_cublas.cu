@@ -50,7 +50,7 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
       cudaMemcpy(dev_b_mem, b.data(), byte_count, cudaMemcpyHostToDevice));
 
   CUBLAS_CALL(cublasCreate(&handle));
-  CUBLAS_CALL(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha, dev_a_mem, n, dev_b_mem, n, &beta, dev_result_mem, n));
+  CUBLAS_CALL(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha, dev_b_mem, n, dev_a_mem, n, &beta, dev_result_mem, n));
   cublasDestroy(handle);
 
   CUDA_CALL(cudaMemcpy(reinterpret_cast<void*>(result.data()),
