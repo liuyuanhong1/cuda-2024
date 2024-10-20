@@ -10,10 +10,14 @@ std::vector<float> GeluOMP(const std::vector<float>& input) {
     size_t n = input.size();
     std::vector<float> output(n);
 
+    const float sqrt_2_over_pi = std::sqrt(2.0 / M_PI);
+
     #pragma omp parallel for
     for (size_t i = 0; i < n; ++i) {
         float x = input[i];
-        float gelu_val = 0.5 * x * (1 + std::tanh(std::sqrt(2 / M_PI) * (x + 0.044715 * std::pow(x, 3))));
+        float x_cubed = x * x * x;
+        float tanh_arg = sqrt_2_over_pi * (x + 0.044715 * x_cubed);
+        float gelu_val = 0.5f * x * (1.0f + std::tanh(tanh_arg));
         output[i] = gelu_val;
     }
 
