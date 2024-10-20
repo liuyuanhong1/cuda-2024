@@ -31,11 +31,17 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
     cudaMemcpy(d_a, a.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
 
-    int blockSize = 64;
-    dim3 dimBlock(blockSize, blockSize);
-    dim3 dimGrid((n + blockSize - 1) / blockSize, (n + blockSize - 1) / blockSize);
+    const size_t sizeAxis = 32u;
+    dim3 threadsPerBlock(
+        sizeAxis,
+        sizeAxis
+    );
+    dim3 numBlocks(
+        (n + sizeAxis - 1) / sizeAxis,
+        (n + sizeAxis - 1) / sizeAxis
+    );
 
-    GemmKernel<<<dimGrid, dimBlock>>>(d_a, d_b, d_c, n);
+    GemmKernel<<<numBlocks, threadsPerBlock>>>(d_a, d_b, d_c, n);
 
     cudaMemcpy(c.data(), d_c, n * n * sizeof(float), cudaMemcpyDeviceToHost);
 
