@@ -42,26 +42,3 @@ std::vector<float> GeluCUDA(const std::vector<float>& input) {
 
     return result;
 }
-
-
-
-
-int main() {
-    
-    std::vector<float> a {0.1,2.4,5.4,3.2};
-    //std::vector<float> a = GenVec(134217728);
-    
-    // Performance Measuring
-    auto start = std::chrono::high_resolution_clock::now();
-    auto c = GeluCUDA(a);
-    auto end = std::chrono::high_resolution_clock::now();
-    
-    std::chrono::duration<double> duration = end - start;
-    std::cout << "Time taken: " << duration.count() << " s" << std::endl;
-
-    for(int i = 0;i < 4;i++){
-        std::cout << c[i] <<"\t";
-    }
-    
-    return 0;
-}
