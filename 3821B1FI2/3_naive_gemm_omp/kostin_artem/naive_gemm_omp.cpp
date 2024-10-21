@@ -5,7 +5,7 @@ std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                 int n) {
     auto size = n * n;
     std::vector<float> res(size, 0.0f);
-#pragma omp parallel for collapse(2) reduction(+: res[:size])
+#pragma omp parallel for collapse(2)
     for (auto i = 0; i < n; ++i) {
         for (auto j = 0; j < n; ++j) {
             float sum = 0.0f;
