@@ -1,37 +1,40 @@
 #include "gelu_cuda.h"
 #include <cuda_fp16.h>
-#include <cuda_runtime.h>
 
-__global__ void geluKernel(const float* input, float* output, size_t size) {
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
-  if (i < size) {
-    float x = input[i];
-    float x3 = x * x * x;
-    float arg = 2.0f / 3.14159265359f * (x + 0.044715f * x3);
-    output[i] = 0.5f * x * (1.0f + tanh(arg));
-  }
+#define BLOCK_SIZE 256
+
+__global__ void geluKernel(const half* input, half* output, size_t size) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < size) {
+        float x = input[idx];
+        float x3 = x * x * x;
+        float tanh_arg = sqrtf(2.0f / M_PI) * (x + 0.044715f * x3);
+        output[idx] = 0.5f * x * (1.0f + tanhf(tanh_arg));
+    }
 }
 
 std::vector<float> GeluCUDA(const std::vector<float>& input) {
-  size_t size = input.size();
-  std::vector<float> output(size);
+    size_t size = input.size();
+    std::vector<float> output(size);
 
-  float* d_input;
-  float* d_output;
-  cudaMalloc(&d_input, size * sizeof(float));
-  cudaMalloc(&d_output, size * sizeof(float));
+    half* d_input;
+    half* d_output;
 
-  cudaMemcpy(d_input, input.data(), size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMalloc(&d_input, size * sizeof(half));
+    cudaMalloc(&d_output, size * sizeof(half));
 
-  int threadsPerBlock = 256;
-  int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
-  geluKernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
+    cudaMemcpy(d_input, input.data(), size * sizeof(half), cudaMemcpyHostToDevice);
 
-  cudaMemcpy(output.data(), d_output, size * sizeof(float), cudaMemcpyDeviceToHost);
+    const int threadsPerBlock = BLOCK_SIZE;
+    const int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock; 
+    geluKernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
 
-  cudaFree(d_input);
-  cudaFree(d_output);
+    cudaDeviceSynchronize(); 
 
-  return output;
+    cudaMemcpy(output.data(), d_output, size * sizeof(half), cudaMemcpyDeviceToHost);
+
+    cudaFree(d_input);
+    cudaFree(d_output);
+
+    return output;
 }
-
