@@ -7,7 +7,7 @@
 
 const float sqrt2pi = 0.797884f;
 
-__global__ void gelu_kernel(const float* sample, float* result,
+__global__ void kernel(const float* sample, float* result,
                             size_t elemCount) {
   size_t id = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -36,7 +36,7 @@ std::vector<float> GeluCUDA(const std::vector<float>& input) {
   size_t threadsPerBlock = deviceProp.maxThreadsPerBlock;
   size_t blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
 
-  myKernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
+  kernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
 
   cudaMemcpy(output.data(), d_output, sizeInBytes, cudaMemcpyDeviceToHost);
 
