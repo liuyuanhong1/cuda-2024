@@ -1,0 +1,5 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/2_gelu_cuda/benduyzhko_tatiana/gelu_cuda.cu(39): error: identifier "myKernel" is undefined
+    myKernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
+    ^
+
+1 error detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI3/2_gelu_cuda/benduyzhko_tatiana/gelu_cuda.cu".
