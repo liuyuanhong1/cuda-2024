@@ -1,4 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/3_naive_gemm_omp/kostin_artem/naive_gemm_omp.cpp: In function ‘std::vector<float> NaiveGemmOMP(const std::vector<float>&, const std::vector<float>&, int)’:
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/3_naive_gemm_omp/kostin_artem/naive_gemm_omp.cpp:8:51: error: ‘res’ does not have pointer or array type
-    8 | #pragma omp parallel for collapse(2) reduction(+: res[:size])
-      |                                                   ^~~
