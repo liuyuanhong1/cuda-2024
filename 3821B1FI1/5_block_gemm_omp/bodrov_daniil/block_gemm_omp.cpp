@@ -7,7 +7,7 @@ std::vector<float> BlockGemmOMP(const std::vector<float>& a,
                                 const std::vector<float>& b,
                                 int n) {
     std::vector<float> c(n * n, 0.0f);
-    const int block_size = 64; // Оптимальный размер блока можно подобрать экспериментально
+    const int block_size = 192; // Оптимальный размер блока можно подобрать экспериментально
 
     #pragma omp parallel for
     for (int i = 0; i < n; i += block_size) {
