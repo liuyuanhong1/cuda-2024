@@ -2,7 +2,7 @@
 #include "gelu_omp.h"
 #include <omp.h>
 #include <cmath>
-#include <stdexpect>
+#include <stdexcept>
 
 std::vector<float> GeluOMP(const std::vector<float> &input) {
     if (input.empty()) {
@@ -17,7 +17,7 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
     #pragma omp parallel for
     for (std::size_t i = 0; i < input.size(); ++i) {
         float x = input[i];
-        output[i] = 0.5f * x * (1.0f + std::tan(sqrt_2pi * (x + coeff_cubic * x * x * x)));
+        output[i] = 0.5f * x * (1.0f + std::tanh(sqrt_2pi * (x + coeff_cubic * x * x * x)));
     }
 
     return output;
