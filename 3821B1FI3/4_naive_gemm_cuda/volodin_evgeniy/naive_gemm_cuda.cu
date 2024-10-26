@@ -10,9 +10,11 @@ __global__ void gemm_kernel(const float* a, const float* b, float* c, int n) {
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (row < n && col < n) {
+        float sum = 0.0f;
         for (int k = 0; k < n; ++k) {
-            c[row * n + col] += a[row * n + k] * b[k * n + col];
+            sum += a[row * n + k] * b[k * n + col];
         }
+        c[row * n + col] = sum;
     }
 }
 
@@ -21,7 +23,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a, const std::vector<
         throw std::invalid_argument("Matrix size does not match the specified n*n dimensions!");
     }
 
-    std::vector<float> c(n * n);
+    std::vector<float> c(n * n, 0.0f);
 
     float *ptr_a, *ptr_b, *ptr_c;
 
@@ -58,14 +60,11 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a, const std::vector<
         throw std::runtime_error("Failed to copy matrix B to device.");
     }
 
-    cudaDeviceProp deviceProp;
-    cudaGetDeviceProperties(&deviceProp, 0);
-    int blockSize = deviceProp.maxThreadsPerBlock;
-    int blockDim = sqrt(blockSize);
+    int blockSize = 32;
 
-    dim3 block(blockDim, blockDim);
+    dim3 block(blockSize, blockSize);
     dim3 grid((n + block.x - 1) / block.x, (n + block.y - 1) / block.y);
-
+    
     gemm_kernel<<<grid, block>>>(ptr_a, ptr_b, ptr_c, n);
 
     cudaDeviceSynchronize();
