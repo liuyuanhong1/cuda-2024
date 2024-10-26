@@ -1,0 +1,4 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/1_gelu_omp/volodin_evgeniy/gelu_omp.cpp:5:10: fatal error: stdexpect: No such file or directory
+    5 | #include <stdexpect>
+      |          ^~~~~~~~~~~
+compilation terminated.
