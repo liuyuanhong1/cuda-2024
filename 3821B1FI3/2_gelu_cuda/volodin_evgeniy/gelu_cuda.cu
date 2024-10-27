@@ -12,7 +12,7 @@ __global__ void gelu_kernel(const float* input, float* output, std::size_t size)
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < size) {
         float x = input[idx];
-        output[idx] = 0.5f * x * (1.0f + tanf(sqrt_2pi * (x + coeff_cubic * x * x * x)));
+        output[idx] = 0.5f * x * (1.0f + tanh(sqrt_2pi * (x + coeff_cubic * x * x * x)));
     }
 }
 
@@ -51,7 +51,7 @@ std::vector<float> GeluCUDA(const std::vector<float>& input) {
         throw std::runtime_error("Failed to copy input data to device.");
     }
 
-    int blockSize = std::min(deviceProp.maxThreadsPerBlock, 1024);
+    int blockSize = std::min(deviceProp.maxThreadsPerBlock, 256);
     int numBlocks = (size + blockSize - 1) / blockSize;
 
     gelu_kernel<<<numBlocks, blockSize>>>(ptr_input, ptr_output, size);
