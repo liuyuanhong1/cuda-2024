@@ -19,12 +19,17 @@ Size of result vector should be the same as for `input`. Use OpenMP technology t
 #endif
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
-    // Implement GELU function with omp
-    size_t n = input.size();
-    std::vector<float> result(n);
+    std::vector<float> output(input.size());
+    const float sqrt_2_over_pi = std::sqrt(2.0 / M_PI);
+    const float coeff = 0.044715f;
+
     #pragma omp parallel for
-    for (size_t i = 0; i < n; i++) {
-        result[i] = 0.5 * input[i] * (1 + tanh(sqrt(2 / M_PI) * (input[i] + 0.044715 * pow(input[i], 3))));
+    for (size_t i = 0; i < input.size(); ++i) {
+        float x = input[i];
+        float x_cubed = x * x * x;
+        float tanh_value = std::tanh(sqrt_2_over_pi * (x + coeff * x_cubed));
+        output[i] = 0.5f * x * (1.0f + tanh_value);
     }
-    return result;
+
+    return output;
 }
