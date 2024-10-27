@@ -2,7 +2,7 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 
-constexpr int BLOCK_SIZE = 64;
+constexpr int BLOCK_SIZE = 32;
 
 __global__ void BlockGemmKernel(const float* __restrict__ a, const float* __restrict__ b, float* c, int n) {
     __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
