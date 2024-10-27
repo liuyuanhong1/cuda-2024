@@ -11,13 +11,14 @@ __global__ void blockGemmKernel(const float* A, const float* B, float* C, int n)
     int col = threadIdx.x;
 
     int cIndex = (blockRow * BLOCK_SIZE + row) * n + (blockCol * BLOCK_SIZE + col);
-
     float cValue = 0.0f;
 
     __shared__ float sharedA[BLOCK_SIZE][BLOCK_SIZE];
     __shared__ float sharedB[BLOCK_SIZE][BLOCK_SIZE];
 
-    for (int m = 0; m < n / BLOCK_SIZE; ++m) {
+    int numBlocks = n / BLOCK_SIZE;
+
+    for (int m = 0; m < numBlocks; ++m) {
         sharedA[row][col] = A[(blockRow * BLOCK_SIZE + row) * n + (m * BLOCK_SIZE + col)];
         sharedB[row][col] = B[(m * BLOCK_SIZE + row) * n + (blockCol * BLOCK_SIZE + col)];
 
@@ -33,11 +34,8 @@ __global__ void blockGemmKernel(const float* A, const float* B, float* C, int n)
     C[cIndex] = cValue;
 }
 
-std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
-                                 const std::vector<float>& b,
-                                 int n) {
+std::vector<float> BlockGemmCUDA(const std::vector<float>& a, const std::vector<float>& b, int n) {
     size_t matrixSize = n * n * sizeof(float);
-
     float *d_A, *d_B, *d_C;
     cudaMalloc((void**)&d_A, matrixSize);
     cudaMalloc((void**)&d_B, matrixSize);
