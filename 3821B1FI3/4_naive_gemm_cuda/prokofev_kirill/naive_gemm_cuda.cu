@@ -55,19 +55,3 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
 
 }
 
-int main() {
-    
-    std::vector<float> a = {1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0};
-    std::vector<float> b = {1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0};
-    // Performance Measuring
-    auto start = std::chrono::high_resolution_clock::now();
-    auto c = NaiveGemmCUDA(a,b,3);
-    auto end = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> duration = end - start;
-    std::cout << "Time taken: " << duration.count() << " s" << std::endl;
-
-    for(int i = 0;i < 9;i++){
-        std::cout << c[i] <<"\t";
-    }
-    return 0;
-}
