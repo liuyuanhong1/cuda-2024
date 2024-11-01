@@ -8,8 +8,8 @@
 
 
 
-__global__ void MulMatrixKernel(const float* a, const float* b, float* c, int n, int offset) {
-    size_t row = offset + blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void MulMatrixKernel(const float* a, const float* b, float* c, int n) {
+    size_t row = blockIdx.y * blockDim.y + threadIdx.y;
     size_t col = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (row < n && col < n) {
@@ -21,48 +21,53 @@ __global__ void MulMatrixKernel(const float* a, const float* b, float* c, int n,
     }
 }
 
+
 std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
                                  const std::vector<float>& b,
                                  int n) {
     
-    
     const size_t count = n * n;
     std::vector<float> result(count, 0.0f);
-    
     float* deviceA = nullptr;
     float* deviceB = nullptr;
     float* deviceResult = nullptr;
-    cudaMalloc(&deviceA, count * sizeof(float));
-    cudaMalloc(&deviceB, count * sizeof(float));
-    cudaMalloc(&deviceResult, count * sizeof(float));
-
-   
-    const int numStreams = 4; 
-    cudaStream_t streams[numStreams];
-    for (int i = 0; i < numStreams; ++i) {
-        cudaStreamCreate(&streams[i]);
-    }
-
+    cudaMalloc((void**)&deviceA, count * sizeof(float));
+    cudaMalloc((void**)&deviceB, count * sizeof(float));
+    cudaMalloc((void**)&deviceResult, count * sizeof(float));
     cudaMemcpy(deviceA, a.data(), count * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(deviceB, b.data(), count * sizeof(float), cudaMemcpyHostToDevice);
-
-    dim3 blockSize(16, 16);
-    dim3 gridSize((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
-
-    for (int i = 0; i < numStreams; ++i) {
-        int offset = (n / numStreams) * i; 
-        int rows = (i == numStreams - 1) ? n - offset : (n / numStreams); 
-
-        MulMatrixKernel<<<gridSize, blockSize, 0, streams[i]>>>(deviceA, deviceB, deviceResult, rows, offset);
+    int device;
+    cudaGetDevice(&device);
+    cudaDeviceProp device_prop;
+    cudaGetDeviceProperties(&device_prop, device);
+    const double block_dim_x = std::sqrt(device_prop.maxThreadsPerBlock);
+    const double num_blocks_x = (n + block_dim_x - 1) / block_dim_x;
+    dim3 blockSize(block_dim_x, block_dim_x);
+    dim3 numBlocks(num_blocks_x, num_blocks_x);
+    MulMatrixKernel<<<numBlocks, blockSize>>>(deviceA, deviceB, deviceResult, n);
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess) {
+        std::cerr << "CUDA Error: " << cudaGetErrorString(err) << std::endl;
     }
-
     cudaMemcpy(result.data(), deviceResult, count * sizeof(float), cudaMemcpyDeviceToHost);
-
-    for (int i = 0; i < numStreams; ++i) {
-        cudaStreamSynchronize(streams[i]);
-        cudaStreamDestroy(streams[i]);
-    }
 
     return result;
 
+}
+
+int main() {
+    
+    std::vector<float> a = {1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0};
+    std::vector<float> b = {1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0};
+    // Performance Measuring
+    auto start = std::chrono::high_resolution_clock::now();
+    auto c = NaiveGemmCUDA(a,b,3);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> duration = end - start;
+    std::cout << "Time taken: " << duration.count() << " s" << std::endl;
+
+    for(int i = 0;i < 9;i++){
+        std::cout << c[i] <<"\t";
+    }
+    return 0;
 }
