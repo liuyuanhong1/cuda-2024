@@ -45,10 +45,12 @@ __global__ void naive_gemm_kernel(const float* a, const float* b, float* result,
     for (int k = 0; k < block_dim_value; k++) {
       c_value += a_block[local_y][k] * b_block[k][local_x];
     }
+    __syncthreads();     
   }
-  __syncthreads();     
 
-  result[global_y * n + global_x] = c_value;
+  if (global_x < n && global_y < n) {
+    result[global_y * n + global_x] = c_value;
+  }
 }
 
 std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
@@ -63,7 +65,7 @@ std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
   float* dev_result_mem = nullptr;
 
   dim3 block_dim(block_dim_value, block_dim_value);
-  dim3 grid_dim(ceil(n / block_dim.x), ceil(n / block_dim.y));
+  dim3 grid_dim((n + block_dim.x - 1) / block_dim.x, (n + block_dim.y - 1) / block_dim.y);
 
   CUDA_CALL(cudaMalloc(reinterpret_cast<void**>(&dev_a_mem), byte_count));
   CUDA_CALL(cudaMalloc(reinterpret_cast<void**>(&dev_b_mem), byte_count));
