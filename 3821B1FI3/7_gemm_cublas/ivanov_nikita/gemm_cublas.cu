@@ -26,15 +26,23 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
     const float alpha = 1.0f;
     const float beta = 0.0f;
 
-    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha, d_a, n, d_b, n, &beta, d_c, n);
+    cublasSetMathMode(handle, CUBLAS_TF32_TENSOR_OP_MATH);
+
+    cublasGemmEx(handle,
+                 CUBLAS_OP_N, CUBLAS_OP_N,
+                 n, n, n,
+                 &alpha,
+                 d_b, CUDA_R_32F, n,
+                 d_a, CUDA_R_32F, n,
+                 &beta,
+                 d_c, CUDA_R_32F, n,
+                 CUBLAS_COMPUTE_32F_FAST_16F, CUBLAS_GEMM_DEFAULT);
 
     cudaMemcpy(c.data(), d_c, sizeInBytes, cudaMemcpyDeviceToHost);
 
     cudaFree(d_a);
     cudaFree(d_b);
     cudaFree(d_c);
-
-    cublasDestroy(handle);
 
     return c;
 }
