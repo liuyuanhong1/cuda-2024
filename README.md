@@ -423,6 +423,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |REF|REF|0.8126|
 |3821B1PE3|smirnov_pavel|1.4899|
 |3821B1PE1|vanushkin_dmitry|1.5001|
+|3821B1PE1|kriseev_mikhail|BUILD FAILED|
 
 ## 2_gelu_cuda (134217728 elements)
 |Group|Name|Result|
@@ -437,8 +438,8 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|sharapov_georgiy|0.2466|
 |3821B1FI1|veselov_ilya|0.2470|
 |3821B1FI2|kostin_artem|0.2482|
-|3821B1PE1|smirnov_leonid|0.2500|
 |3821B1PE3|Musaev_Ilgar|0.2500|
+|3821B1PE1|smirnov_leonid|0.2500|
 |3821B1FI3|kulagin_aleksandr|0.2506|
 |3821B1FI3|volodin_evgeniy|0.2509|
 |3821B1FI2|petrov_maksim|0.2540|
@@ -456,6 +457,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3_naive_gemm_omp (1024 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1PE1|yurin_andrey|0.1144|
 |3821B1FI3|sharapov_georgiy|0.1553|
 |3821B1FI3|ivanov_nikita|0.1681|
 |3821B1FI1|bodrov_daniil|0.1690|
@@ -481,6 +483,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 4_naive_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1PE1|yurin_andrey|0.1611|
 |3821B1FI3|kulaev_zhenya|0.1762|
 |3821B1FI1|veselov_ilya|0.1763|
 |3821B1FI3|ivanov_nikita|0.1789|
@@ -606,6 +609,16 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|simonyan_suren|**9/9**|
 |3821B1FI3|volodin_evgeniy|4/9|
 
+## 3821B1PE1
+|Group|Name|Passed|
+|-----|----|------|
+|3821B1PE1|kashin_stepan|1/9|
+|3821B1PE1|khramov_ivan|2/9|
+|3821B1PE1|kriseev_mikhail|0/9|
+|3821B1PE1|smirnov_leonid|6/9|
+|3821B1PE1|vanushkin_dmitry|2/9|
+|3821B1PE1|yurin_andrey|4/9|
+
 ## 3821B1FI2
 |Group|Name|Passed|
 |-----|----|------|
@@ -618,15 +631,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |-----|----|------|
 |3821B1FI1|bodrov_daniil|6/9|
 |3821B1FI1|veselov_ilya|8/9|
-
-## 3821B1PE1
-|Group|Name|Passed|
-|-----|----|------|
-|3821B1PE1|kashin_stepan|1/9|
-|3821B1PE1|khramov_ivan|2/9|
-|3821B1PE1|smirnov_leonid|6/9|
-|3821B1PE1|vanushkin_dmitry|2/9|
-|3821B1PE1|yurin_andrey|2/9|
 
 ## 3821B1PE3
 |Group|Name|Passed|
