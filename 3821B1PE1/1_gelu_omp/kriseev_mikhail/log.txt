@@ -1,8 +1,1 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kriseev_mikhail/gelu_omp.cpp: In function ‘std::vector<float> GeluOMP(const std::vector<float>&)’:
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kriseev_mikhail/gelu_omp.cpp:15:38: error: ‘const’ qualified ‘size’ without ‘mutable’ member may appear only in ‘shared’ or ‘firstprivate’ clauses
-   15 |     #pragma omp parallel for private(size)
-      |                                      ^~~~
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kriseev_mikhail/gelu_omp.cpp:19:58: error: ‘expf’ is not a member of ‘std’; did you mean ‘exp2f’?
-   19 |         output_data[i] = x * (1.0f - 1.0f / (1.0f + std::expf(x * (GELU_COEF1 + x * x * GELU_COEF2))));
-      |                                                          ^~~~
-      |                                                          exp2f
+Incorrect results, test input_100_100.bin, difference 1.0
