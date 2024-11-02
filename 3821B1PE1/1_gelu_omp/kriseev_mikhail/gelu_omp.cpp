@@ -7,7 +7,7 @@
 std::vector<float> GeluOMP(const std::vector<float>& input) {
     std::vector<float> output(input.size());
 
-    const int size = input.size();
+    int size = input.size();
 
     const float* input_data = input.data();
     float* output_data = output.data();
@@ -16,7 +16,7 @@ std::vector<float> GeluOMP(const std::vector<float>& input) {
     for (int i = 0; i < size; i++) {
         float x = input_data[i];
         
-        output_data[i] = x * (1.0f - 1.0f / (1.0f + std::expf(x * (GELU_COEF1 + x * x * GELU_COEF2)))); 
+        output_data[i] = x * (1.0f - 1.0f / (1.0f + std::exp(x * (GELU_COEF1 + x * x * GELU_COEF2)))); 
     }
 
     return output;
