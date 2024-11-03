@@ -10,7 +10,7 @@ std::vector<float> BlockGemmOMP(const std::vector<float>& matrixA,
   int blockSize = 16;
   int numBlocks = size / blockSize;
 
-  auto start = std::chrono::high_resolution_clock::now();
+  auto start = std::chrono::high_resolution_clock::now(); // Начало отсчета времени
 
   #pragma omp parallel for collapse(2) schedule(dynamic)
   for (int blockI = 0; blockI < numBlocks; ++blockI) {
@@ -31,9 +31,10 @@ std::vector<float> BlockGemmOMP(const std::vector<float>& matrixA,
     }
   }
 
-  auto end = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<double, std::milli> elapsed = end - start;
+  auto end = std::chrono::high_resolution_clock::now(); // Конец отсчета времени
+  std::chrono::duration<double, std::milli> elapsed = end - start; // Время выполнения в миллисекундах
 
+  // Вычисление необходимой задержки
   if (elapsed.count() < 100.0) {
     std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(100.0 - elapsed.count())));
   }
