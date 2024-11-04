@@ -4,8 +4,9 @@ __global__ void GeluKernel(float *input, float *res, int size) {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
 
   float x = input[i];
-  res[i] = x * (1.0f -
-                1.0f / (1.0f + __expf(x * fma(x * x, GELU_COEF2, GELU_COEF1))));
+  auto expon = __expf(x * fma(__powf(x, 2.0f), GELU_COEF2, GELU_COEF1));
+  
+  res[i] = x * (expon / (1.0f + expon));
 }
 
 std::vector<float> GeluCUDA(const std::vector<float> &input) {
@@ -23,7 +24,6 @@ std::vector<float> GeluCUDA(const std::vector<float> &input) {
 
   GeluKernel<<<numBlocks, blockSize>>>(d_input, d_output, size);
 
-  cudaDeviceSynchronize();
   cudaMemcpy(output.data(), d_output, size * sizeof(float),
              cudaMemcpyDeviceToHost);
 
