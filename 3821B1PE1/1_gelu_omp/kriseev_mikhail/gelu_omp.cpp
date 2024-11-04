@@ -7,16 +7,16 @@
 std::vector<float> GeluOMP(const std::vector<float>& input) {
     std::vector<float> output(input.size());
 
-    int size = input.size();
+    const int size = input.size();
 
     const float* input_data = input.data();
     float* output_data = output.data();
 
-    #pragma omp parallel for private(size)
+    #pragma omp parallel for
     for (int i = 0; i < size; i++) {
         float x = input_data[i];
         
-        output_data[i] = x * (1 - 1 / (1.0f + std::exp(x * (GELU_COEF1 + x * x * GELU_COEF2)))); 
+        output_data[i] = x * (1.0f - 1.0f / (1.0f + std::exp(x * (GELU_COEF1 + x * x * GELU_COEF2)))); 
     }
 
     return output;
