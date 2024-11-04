@@ -5,15 +5,6 @@
 #include <vector>
 #include <utility>
 
-const char* kernel_source = R"(
-__kernel void gelu(__global const float* input, __global float* output, int size) {
-    int idx = get_global_id(0);
-    if (idx < size) {
-        float x = input[idx];
-        output[idx] = x / (1.0f + exp(-1.59577f * (x + 0.044715f * x * x * x)));
-    }
-}
-)";
 
 std::vector<float> GeluOCL(const std::vector<float>& input) {
     std::vector<cl::Platform> platforms;
@@ -53,7 +44,7 @@ __kernel void myGelu(__global const float* input, __global float* output, int si
     cl::Buffer input_buffer(context, CL_MEM_READ_ONLY, sizeInBytes);
     cl::Buffer output_buffer(context, CL_MEM_WRITE_ONLY, sizeInBytes);
 
-    queue.enqueueWriteBuffer(output_buffer, CL_TRUE,
+    queue.enqueueWriteBuffer(input_buffer, CL_TRUE,
                              0, sizeInBytes,
                              input.data());
 
