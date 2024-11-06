@@ -508,6 +508,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kulikov_artem|0.2340|
 |3821B1FI3|benduyzhko_tatiana|0.2353|
 |3821B1PE1|smirnov_leonid|0.2357|
+|3821B1FI3|tyulkina_olga|0.2358|
 |3821B1FI3|prokofev_kirill|0.2369|
 |3821B1FI2|zakharov_artem|0.2689|
 |3821B1FI3|volodin_evgeniy|0.2805|
@@ -572,6 +573,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kulikov_artem|0.0478|
 |3821B1FI3|benduyzhko_tatiana|0.0497|
 |3821B1PE1|yurin_andrey|0.0498|
+|3821B1PE3|Musaev_Ilgar|0.0498|
 |3821B1FI3|kuznetsov_artyom|0.0559|
 |3821B1FI1|veselov_ilya|0.0566|
 |3821B1FI3|simonyan_suren|0.0579|
@@ -591,6 +593,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kuznetsov_artyom|0.1375|
 |3821B1FI3|kulikov_artem|0.1375|
 |3821B1FI3|benduyzhko_tatiana|0.1388|
+|3821B1PE3|Musaev_Ilgar|0.1402|
 |3821B1PE1|smirnov_leonid|0.1420|
 |3821B1PE1|yurin_andrey|0.1426|
 |3821B1FI3|sharapov_georgiy|0.1574|
@@ -607,11 +610,12 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kuznetsov_artyom|0.2646|
 |3821B1FI3|kulikov_artem|0.2766|
 |3821B1FI3|simonyan_suren|0.2802|
+|3821B1PE3|Musaev_Ilgar|0.2804|
 |3821B1FI3|benduyzhko_tatiana|0.2856|
 |3821B1FI3|sharapov_georgiy|0.2870|
 |3821B1FI3|ivanov_nikita|0.2909|
+|3821B1PE3|smirnov_pavel|0.2974|
 |3821B1PE1|smirnov_leonid|0.2976|
-|3821B1PE3|smirnov_pavel|BUILD FAILED|
 
 # Tasks Done
 ## 3821B1FI1
@@ -643,7 +647,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|sadikov_damir|6/9|
 |3821B1FI3|sharapov_georgiy|**9/9**|
 |3821B1FI3|simonyan_suren|**9/9**|
-|3821B1FI3|tyulkina_olga|3/9|
+|3821B1FI3|tyulkina_olga|4/9|
 |3821B1FI3|volodin_evgeniy|4/9|
 
 ## 3821B1PE1
@@ -665,6 +669,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3821B1PE3
 |Group|Name|Passed|
 |-----|----|------|
-|3821B1PE3|Musaev_Ilgar|6/9|
-|3821B1PE3|smirnov_pavel|8/9|
+|3821B1PE3|Musaev_Ilgar|**9/9**|
+|3821B1PE3|smirnov_pavel|**9/9**|
 
