@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #include "gelu_omp.h"
 
 #include <cmath>

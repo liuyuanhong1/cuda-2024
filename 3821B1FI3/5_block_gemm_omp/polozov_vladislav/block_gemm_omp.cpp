@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #include "block_gemm_omp.h"
 
 std::vector<float> BlockGemmOMP(const std::vector<float> &a,

@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #ifndef __FFT_CUFFT_H
 #define __FFT_CUFFT_H
 

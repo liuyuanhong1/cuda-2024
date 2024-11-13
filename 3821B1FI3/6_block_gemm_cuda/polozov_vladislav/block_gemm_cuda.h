@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #ifndef __BLOCK_GEMM_CUDA_H
 #define __BLOCK_GEMM_CUDA_H
 

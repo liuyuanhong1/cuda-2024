@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #ifndef __GEMM_CUBLAS_H
 #define __GEMM_CUBLAS_H
 

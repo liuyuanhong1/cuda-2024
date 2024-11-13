@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #ifndef __GELU_OCL_H
 #define __GELU_OCL_H
 

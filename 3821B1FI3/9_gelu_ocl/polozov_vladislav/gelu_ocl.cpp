@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Polozov Vladislav
 #include "gelu_ocl.h"
 
 #include <CL/opencl.hpp>
