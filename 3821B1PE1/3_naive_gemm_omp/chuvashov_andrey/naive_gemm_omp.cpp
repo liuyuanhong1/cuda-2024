@@ -13,10 +13,10 @@ std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
     std::vector<float> c(n * n);
 
     #pragma omp parallel for collapse(2)
-    for (size_t i = 0; i < n; i++) {
-        for (size_t j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             float current = 0.0f;
-            for (size_t k = 0; k < n; k++) {
+            for (int k = 0; k < n; k++) {
                 current += a[i * n + k] * b[k * n + j];
             }
             c[i * n + j] = current;
