@@ -6,19 +6,7 @@
 #include <utility>
 
 std::vector<float> GeluOCL(const std::vector<float>& input) {
-    std::vector<cl::Platform> platforms;
-    cl::Platform::get(&platforms);
-
-    cl::Platform platform = platforms.front();
-
-    std::vector<cl::Device> devices;
-    platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
-    cl::Device device = devices.front();
-
-    cl::Context context(device);
-    cl::CommandQueue queue(context);
-
-    std::string kernCode = R"(
+  std::string kernelCode = R"(
 __kernel void myKernel(__global const float* input, __global float* output, int size) {
     int i = get_global_id(0);
 
@@ -29,34 +17,42 @@ __kernel void myKernel(__global const float* input, __global float* output, int 
 }
 )";
 
-    cl::Program::Sources sources;
-    sources.emplace_back(std::move(kernCode));
+  std::vector<cl::Platform> platforms;
+  cl::Platform::get(&platforms);
 
-    cl::Program program(context, sources);
-    program.build();
+  cl::Platform platform = platforms.front();
 
-    cl::Kernel kernel(program, "myKernel");
+  std::vector<cl::Device> devices;
+  platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+  cl::Device device = devices.front();
 
-    size_t size = input.size();
-    size_t sizeInBytes = size * sizeof(*input.data());
+  cl::Context context(device);
+  cl::CommandQueue queue(context);
 
-    cl::Buffer bufferInput(context, CL_MEM_READ_ONLY, sizeInBytes);
-    cl::Buffer bufferOutput(context, CL_MEM_WRITE_ONLY, sizeInBytes);
+  cl::Program::Sources sources;
+  sources.emplace_back(std::move(kernelCode));
 
-    queue.enqueueWriteBuffer(bufferInput, CL_TRUE,
-                             0, sizeInBytes,
-                             input.data());
+  cl::Program program(context, sources);
+  program.build();
 
-    kernel.setArg(0, bufferInput);
-    kernel.setArg(1, bufferOutput);
-    kernel.setArg(2, static_cast<int>(size));
-    queue.enqueueNDRangeKernel(kernel,
-                               cl::NullRange, cl::NDRange(size), cl::NullRange);
+  cl::Kernel kernel(program, "myKernel");
 
-    std::vector<float> output(size);
-    queue.enqueueReadBuffer(bufferOutput, CL_TRUE,
-                            0, sizeInBytes,
-                            output.data());
+  size_t size = input.size();
+  size_t sizeInBytes = size * sizeof(*input.data());
 
-    return output;
+  cl::Buffer bufferInput(context, CL_MEM_READ_ONLY, sizeInBytes);
+  cl::Buffer bufferOutput(context, CL_MEM_WRITE_ONLY, sizeInBytes);
+
+  queue.enqueueWriteBuffer(bufferInput, CL_TRUE, 0, sizeInBytes, input.data());
+
+  kernel.setArg(0, bufferInput);
+  kernel.setArg(1, bufferOutput);
+  kernel.setArg(2, static_cast<int>(size));
+  queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(size),
+                             cl::NullRange);
+
+  std::vector<float> output(size);
+  queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, sizeInBytes, output.data());
+
+  return output;
 }
