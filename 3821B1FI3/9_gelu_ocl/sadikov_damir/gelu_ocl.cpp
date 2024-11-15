@@ -29,7 +29,7 @@ R"(__kernel void gelu_kernel(__global float* a, __global float* res, const int n
 
   cl_mem input_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float) * sz, nullptr, nullptr);
   cl_mem output_buffer = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * sz, nullptr, nullptr);
-  clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, sizeof(float) * input.size(), &sz, 0, nullptr, nullptr);
+  clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, sizeof(float) * sz, input.data(), 0, nullptr, nullptr);
 
   cl_program program = clCreateProgramWithSource(context, 1, &kernel_source, nullptr, nullptr);
   clBuildProgram(program, 1, &device, nullptr, nullptr, nullptr);
