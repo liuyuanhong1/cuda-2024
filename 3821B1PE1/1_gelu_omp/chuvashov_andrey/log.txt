@@ -1,0 +1,10 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/chuvashov_andrey/gelu_omp.cpp:7:48: error: expected ‘)’ before ‘;’ token
+    7 | const float pi_c = sqrt(2.0f / (2 * asin(1.0f)); // sqrt(2 / pi)
+      |                        ~                       ^
+      |                                                )
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/chuvashov_andrey/gelu_omp.cpp: In function ‘std::vector<float> GeluOMP(const std::vector<float>&)’:
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/chuvashov_andrey/gelu_omp.cpp:19:12: error: could not convert ‘length’ from ‘const size_t’ {aka ‘const long unsigned int’} to ‘std::vector<float>’
+   19 |     return length;
+      |            ^~~~~~
+      |            |
+      |            const size_t {aka const long unsigned int}
