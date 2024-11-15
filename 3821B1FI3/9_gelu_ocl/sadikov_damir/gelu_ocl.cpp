@@ -12,19 +12,17 @@ R"(__kernel void gelu_kernel(__global float* a, __global float* res, const int n
 		res[i] = 0.5f * x * (1.f + tanhf(0.7978845608028653f * x * (1.0f + 0.044715f * x * x)));
 	}
 })";
-  
-  size_t sz = static_cast<int>(input.size());
+
+  int sz = static_cast<int>(input.size());
   std::vector<float> output(sz);
 
   cl_platform_id platform;
   cl_device_id device;
 
   clGetPlatformIDs(1, &platform, nullptr);
-
   clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &device, nullptr);
 
   cl_context context = clCreateContext(nullptr, 1, &device, nullptr, nullptr, nullptr);
-
   cl_command_queue queue = clCreateCommandQueue(context, device, 0, nullptr);
 
   cl_mem input_buffer = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(float) * sz, nullptr, nullptr);
