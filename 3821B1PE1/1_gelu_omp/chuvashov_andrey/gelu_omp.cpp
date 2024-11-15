@@ -4,7 +4,7 @@
 #include <math.h>
 #include <omp.h>
 
-const float pi_c = sqrt(2.0f / (2 * asin(1.0f)); // sqrt(2 / pi)
+const float pi_c = sqrt(2.0f / (2 * asin(1.0f))); // sqrt(2 / pi)
 const float par_c= 0.044715f; // coefficient in parentheses
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
@@ -16,5 +16,5 @@ std::vector<float> GeluOMP(const std::vector<float>& input) {
         float x = input[i];
         result[i] = 0.5f * x * (1.0f + tanhf(pi_c * (x + par_c * x * x * x)));
     }
-    return length;
+    return result;
 }
