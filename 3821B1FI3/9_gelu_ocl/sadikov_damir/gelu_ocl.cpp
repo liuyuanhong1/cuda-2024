@@ -5,15 +5,16 @@
 
 std::vector<float> GeluOCL(const std::vector<float>& input) {
   const char* kernel_source =
-R"(__kernel void gelu_kernel(__global float* a, __global float* res, const size_t n) {
+R"(__kernel void gelu_kernel(__global float* a, __global float* res, int n) {
 	int i = get_global_id(0);
 	if (i < n) {
 		float x = a[i];
-		res[i] = 0.5f * x * (1.f + tanhf(0.7978845608028653f * x * (1.0f + 0.044715f * x * x)));
+		res[i] = 0.5f * x * (1.f + tanh(0.7978845608028653f * x * (1.0f + 0.044715f * x * x)));
 	}
 })";
 
   size_t sz = input.size();
+  int sz_int = static_cast<int>(sz);
   std::vector<float> output(sz);
 
   cl_platform_id platform;
@@ -35,7 +36,7 @@ R"(__kernel void gelu_kernel(__global float* a, __global float* res, const size_
 
   clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buffer);
   clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
-  clSetKernelArg(kernel, 2, sizeof(size_t), &sz);
+  clSetKernelArg(kernel, 2, sizeof(int), &sz_int);
 
   clEnqueueNDRangeKernel(queue, kernel, 1, nullptr, &sz, nullptr, 0, nullptr, nullptr);
   clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, sizeof(float) * sz, output.data(), 0, nullptr, nullptr);
