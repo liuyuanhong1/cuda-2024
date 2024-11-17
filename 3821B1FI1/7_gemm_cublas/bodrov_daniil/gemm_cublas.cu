@@ -1,72 +1,104 @@
 #include "gemm_cublas.h"
-#include <cublas_v2.h>
 #include <cuda_runtime.h>
+#include <cublas_v2.h>
 #include <stdexcept>
 #include <iostream>
 
+// Класс для обработки ошибок CUDA и cuBLAS
+class CUBLASError : public std::runtime_error {
+public:
+    explicit CUBLASError(const char* message)
+        : std::runtime_error(message) {}
+};
+
 // Макрос для проверки ошибок CUDA
-#define CUDA_CHECK(err) \
-    if (err != cudaSuccess) { \
-        throw std::runtime_error(std::string("CUDA Error: ") + cudaGetErrorString(err)); \
-    }
+#define CHECK_CUDA(call)                                              \
+    do {                                                             \
+        cudaError_t err = (call);                                    \
+        if (err != cudaSuccess) {                                    \
+            throw CUBLASError(cudaGetErrorString(err));              \
+        }                                                            \
+    } while (0)
 
 // Макрос для проверки ошибок cuBLAS
-#define CUBLAS_CHECK(err) \
-    if (err != CUBLAS_STATUS_SUCCESS) { \
-        throw std::runtime_error("cuBLAS Error: " + std::to_string(err)); \
-    }
+#define CHECK_CUBLAS(call)                                            \
+    do {                                                             \
+        cublasStatus_t status = (call);                              \
+        if (status != CUBLAS_STATUS_SUCCESS) {                       \
+            throw CUBLASError("cuBLAS operation failed");            \
+        }                                                            \
+    } while (0)
 
-std::vector<float> GemmCUBLAS(const std::vector<float>& a,
-                              const std::vector<float>& b,
-                              int n) {
-    // Размер матриц в байтах
-    size_t bytes = n * n * sizeof(float);
-
-    // Указатели на устройства
-    float *d_a = nullptr, *d_b = nullptr, *d_c = nullptr;
-
-    // Выделение памяти на устройстве
-    CUDA_CHECK(cudaMalloc((void**)&d_a, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_b, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_c, bytes));
-
-    // Копирование данных с хоста на устройство
-    CUDA_CHECK(cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemcpy(d_b, b.data(), bytes, cudaMemcpyHostToDevice));
+std::vector<float> GemmCUBLAS(const std::vector<float>& matrixA,
+                                        const std::vector<float>& matrixB,
+                                        int size) {
+    // Результирующий вектор
+    std::vector<float> matrixC(size * size);
 
     // Создание дескриптора cuBLAS
     cublasHandle_t handle;
-    CUBLAS_CHECK(cublasCreate(&handle));
+    CHECK_CUBLAS(cublasCreate(&handle));
 
-    // Параметры для умножения матриц
-    // В cuBLAS матрицы хранятся в столбцовом порядке, поэтому
-    // чтобы работать с матрицами в строковом порядке, мы используем транспонирование
-    const float alpha = 1.0f;
-    const float beta = 0.0f;
+    // Создание потока CUDA для асинхронных операций
+    cudaStream_t stream;
+    CHECK_CUDA(cudaStreamCreate(&stream));
+    CHECK_CUBLAS(cublasSetStream(handle, stream));
 
-    // Выполнение операции C = A * B
-    // В cuBLAS: C = alpha * op(A) * op(B) + beta * C
-    // Для строкового порядка: C^T = B^T * A^T
-    CUBLAS_CHECK(cublasSgemm(handle,
-                             CUBLAS_OP_T, CUBLAS_OP_T,
-                             n, n, n,
-                             &alpha,
-                             d_b, n,
-                             d_a, n,
-                             &beta,
-                             d_c, n));
+    float *d_A = nullptr, *d_B = nullptr, *d_C = nullptr;
+    size_t bytes = size * size * sizeof(float);
 
-    // Выделение памяти для результата на хосте
-    std::vector<float> c(n * n);
+    try {
+        // Выделение памяти на устройстве
+        CHECK_CUDA(cudaMalloc(&d_A, bytes));
+        CHECK_CUDA(cudaMalloc(&d_B, bytes));
+        CHECK_CUDA(cudaMalloc(&d_C, bytes));
 
-    // Копирование результата с устройства на хост
-    CUDA_CHECK(cudaMemcpy(c.data(), d_c, bytes, cudaMemcpyDeviceToHost));
+        // Копирование данных с хоста на устройство (асинхронно)
+        CHECK_CUBLAS(cublasSetMatrix(size, size, sizeof(float),
+                                     matrixA.data(), size,
+                                     d_A, size));
+        CHECK_CUBLAS(cublasSetMatrix(size, size, sizeof(float),
+                                     matrixB.data(), size,
+                                     d_B, size));
+
+        // Параметры умножения матриц
+        const float alpha = 1.0f;
+        const float beta = 0.0f;
+
+        // Выполнение умножения матриц: C = A * B
+        CHECK_CUBLAS(cublasSgemm(handle,
+                                 CUBLAS_OP_N, CUBLAS_OP_N,
+                                 size, size, size,
+                                 &alpha,
+                                 d_B, size,
+                                 d_A, size,
+                                 &beta,
+                                 d_C, size));
+
+        // Копирование результата с устройства на хост (асинхронно)
+        CHECK_CUBLAS(cublasGetMatrix(size, size, sizeof(float),
+                                     d_C, size,
+                                     matrixC.data(), size));
+
+        // Синхронизация потока для завершения всех операций
+        CHECK_CUDA(cudaStreamSynchronize(stream));
+    }
+    catch (...) {
+        // Освобождение ресурсов в случае исключения
+        if (d_A) cudaFree(d_A);
+        if (d_B) cudaFree(d_B);
+        if (d_C) cudaFree(d_C);
+        cudaStreamDestroy(stream);
+        cublasDestroy(handle);
+        throw; // Переброс исключения
+    }
 
     // Освобождение ресурсов
-    CUBLAS_CHECK(cublasDestroy(handle));
-    CUDA_CHECK(cudaFree(d_a));
-    CUDA_CHECK(cudaFree(d_b));
-    CUDA_CHECK(cudaFree(d_c));
+    cudaFree(d_A);
+    cudaFree(d_B);
+    cudaFree(d_C);
+    cudaStreamDestroy(stream);
+    cublasDestroy(handle);
 
-    return c;
+    return matrixC;
 }
