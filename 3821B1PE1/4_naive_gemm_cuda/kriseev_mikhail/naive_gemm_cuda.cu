@@ -29,12 +29,16 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float> &a,
   cudaMemcpy(a_dev, a.data(), a.size() * sizeof(float), cudaMemcpyHostToDevice);
   cudaMemcpy(b_dev, b.data(), b.size() * sizeof(float), cudaMemcpyHostToDevice);
 
-  int blockSize = 16;
+  int blockSize = 64;
   dim3 blockDim(blockSize, blockSize);
   dim3 gridDim((n + blockSize - 1) / blockSize, (n + blockSize - 1) / blockSize);
 
   naive_gemm_kernel<<<gridDim, blockDim>>>(a_dev, b_dev, output_dev, n);
 
   cudaMemcpy(output.data(), output_dev, n * n * sizeof(float), cudaMemcpyDeviceToHost);
+
+  cudaFree(a_dev);
+  cudaFree(b_dev);
+  cudaFree(output_dev);
   return output;
 }
