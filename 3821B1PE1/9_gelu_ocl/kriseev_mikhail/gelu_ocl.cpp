@@ -4,8 +4,6 @@
 #include <CL/cl_platform.h>
 #include <CL/opencl.h>
 #include <cstddef>
-#include <cstdint>
-#include <iostream>
 #include <stdexcept>
 
 const char *gelu_kernel = R"(
@@ -17,7 +15,6 @@ const char *gelu_kernel = R"(
         int i = get_global_id(0);
 
         if (i < size) {
-            printf ("data %d: %f\n", i, input[i]);
             float x = input[i];
             float expon = exp(x * fma(COEF2, pown(x, 2), COEF1));
 
