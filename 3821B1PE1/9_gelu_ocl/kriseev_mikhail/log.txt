@@ -1,1 +1,2 @@
-Your application is too slow (> 2 seconds)
+terminate called after throwing an instance of 'std::runtime_error'
+  what():  Error enqueuing kernel: -54
