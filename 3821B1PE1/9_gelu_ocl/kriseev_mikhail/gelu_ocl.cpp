@@ -70,9 +70,6 @@ std::vector<float> GeluOCL(const std::vector<float> &input) {
 
   size_t workGroupSize = 8;
 
-  clEnqueueWriteBuffer(queue, inputBuffer, CL_TRUE, 0,
-                       inputSize * sizeof(float), input.data(), 0, NULL, NULL);
-
   auto err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &inputSize, &workGroupSize, 0,
                          NULL, NULL);
   if (err!= CL_SUCCESS) {
