@@ -3,24 +3,9 @@
 #include "gelu_ocl.h"
 
 #include <CL/opencl.hpp>
+#include <iostream>
 
-const  std::string codeKernel = R"(
-    #define COEF1 1.595769122f
-    #define COEF2 0.071354816f
-
-  __kernel void gelu_kernel(__global const float* x, __global float* y, int countElem) {
-    int i = get_global_id(0);
-
-    if (i < countElem) {
-        float value = x[i];
-        float value_sq = value * value;
-        float tmp = value * (COEF1 + value_sq * COEF2);
-        y[i] = value - value / (1.0f + native_exp(tmp));
-    }
-  }
-  )";
-
-std::vector<float> GeluOCL(const std::vector<float>& input) {
+std::vector<float> GeluOCL(const std::vector<float> &input) {
   std::vector<cl::Platform> platforms;
   cl::Platform::get(&platforms);
   cl::Platform platform = platforms.front();
@@ -32,13 +17,30 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
   cl::Context context(device);
   cl::CommandQueue queue(context);
 
+  std::string codeKernel = R"(
+__kernel void gelu_kernel(__global const float* x, __global float* y, int countElem) {
+  int i = get_global_id(0);
+
+  if (i < countElem) {
+      float val = x[i];
+      float tmp = val * (1.595769122f + val * val * 0.071354816f);
+      y[i] = val - val / (1.0f + exp(tmp));
+  }
+}
+)";
+
   cl::Program::Sources sources;
   sources.emplace_back(std::move(codeKernel));
-
   cl::Program program(context, sources);
+  
+  if (program.build() != CL_SUCCESS) {
+    std::cerr << "\033[1;31merror\033[0m: ";
+    std::cerr << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << '\n';
+    return {};
+  }
+
 
   if (input.empty()) return {};
-  
   auto size = input.size();
   auto countBytes = size * sizeof(float);
 
