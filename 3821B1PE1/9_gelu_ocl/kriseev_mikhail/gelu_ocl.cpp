@@ -68,9 +68,7 @@ std::vector<float> GeluOCL(const std::vector<float> &input) {
   clSetKernelArg(kernel, 1, sizeof(cl_mem), &outputBuffer);
   clSetKernelArg(kernel, 2, sizeof(int), &intSize);
 
-  size_t workGroupSize = 8;
-
-  auto err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &inputSize, &workGroupSize, 0,
+  auto err = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &inputSize, NULL, 0,
                          NULL, NULL);
   if (err!= CL_SUCCESS) {
     throw std::runtime_error("Error enqueuing kernel: " + std::to_string(err));
