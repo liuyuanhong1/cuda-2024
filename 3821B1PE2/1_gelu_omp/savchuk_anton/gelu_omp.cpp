@@ -1,16 +1,14 @@
 ﻿#include "gelu_omp.h"
-#include <cmath> // Для функций tanh и sqrt
-#include <omp.h> // Для OpenMP
+#include <cmath> 
+#include <omp.h> 
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846 // Определение числа π
+#define M_PI 3.14159265358979323846 
 #endif
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
-    // Инициализация вектора результата такого же размера, как и input
     std::vector<float> output(input.size());
 
-    // Параллельный цикл для вычисления GELU
 #pragma omp parallel for
     for (int i = 0; i < static_cast<int>(input.size()); ++i) {
         float x = input[i];
