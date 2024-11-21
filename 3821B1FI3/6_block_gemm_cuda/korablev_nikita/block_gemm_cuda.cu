@@ -9,7 +9,7 @@ __global__ void BlockGemmKernel(const float* a, const float* b, float* c, int n,
 
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
-    int tmp = 0;
+    float tmp = .0f;
 
     for (int k = 0; k < n; k += blockSize) {
         if (row < n && k + threadIdx.y < n) {
@@ -41,7 +41,7 @@ __global__ void BlockGemmKernel(const float* a, const float* b, float* c, int n,
 std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
                                  const std::vector<float>& b,
                                  int n) {
-    std::vector<float> c(n * n, 0.0f);
+    std::vector<float> c(n * n, .0f);
 
     float* d_a;
     float* d_b;
