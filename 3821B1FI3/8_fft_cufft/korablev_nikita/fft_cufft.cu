@@ -5,34 +5,39 @@
 #include <vector>
 #include <iostream>
 
+__global__ void normKernel(float* input, int size, float norm) {
+    int i = blockDim.x * blockIdx.x + threadIdx.x;
+    if (i < size)
+        input[i] *= norm;
+}
+
 std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
-    int n = input.size() / (2 * batch);
-    std::vector<float> output(input.size(), 0.0f);
-
-    cufftComplex* d_input;
-    cufftComplex* d_output;
-    cudaMalloc(&d_input, batch * n * sizeof(cufftComplex));
-    cudaMalloc(&d_output, batch * n * sizeof(cufftComplex));
-
-    cudaMemcpy(d_input, input.data(), input.size() * sizeof(float), cudaMemcpyHostToDevice);
+    const int size = input.size();
+    std::vector<float> output(size);
+    int n = (size / batch) >> 1;
+    int sizeInBytes = sizeof(cufftComplex) * n * batch;
 
     cufftHandle plan;
     cufftPlan1d(&plan, n, CUFFT_C2C, batch);
 
-    cufftExecC2C(plan, d_input, d_output, CUFFT_FORWARD);
-    cufftExecC2C(plan, d_output, d_input, CUFFT_INVERSE);
+    cufftComplex* data;
+    cudaMalloc(&data, sizeInBytes);
+    cudaMemcpy(data, input.data(), sizeInBytes, cudaMemcpyHostToDevice);
 
-    float normalizationFactor = 1.0f / n;
-    cufftComplex* d_normalized;
-    cudaMalloc(&d_normalized, batch * n * sizeof(cufftComplex));
-    cufftExecC2C(plan, d_input, d_normalized, CUFFT_FORWARD);
+    cufftExecC2C(plan, data, data, CUFFT_FORWARD);
+    cufftExecC2C(plan, data, data, CUFFT_INVERSE);
 
-    cudaMemcpy(output.data(), d_normalized, input.size() * sizeof(float), cudaMemcpyDeviceToHost);
+    cudaDeviceProp deviceProp;
+    cudaGetDeviceProperties(&deviceProp, 0);
+    size_t threadsPerBlock = deviceProp.maxThreadsPerBlock;
+    size_t blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
 
-    cudaFree(d_input);
-    cudaFree(d_output);
-    cudaFree(d_normalized);
+    float norm = 1.0f / static_cast<float>(n);
+    normKernel<<<blocksPerGrid, threadsPerBlock>>>(
+        reinterpret_cast<float*>(data), size, norm);  // cufftComplex = [float, float]
+    cudaMemcpy(output.data(), data, sizeInBytes, cudaMemcpyDeviceToHost);
 
     cufftDestroy(plan);
+    cudaFree(data);
     return output;
 }
