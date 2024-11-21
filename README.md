@@ -692,7 +692,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI1|alexseev_danila|0.3053|
 |3821B1FI3|korableb_nikita|0.3918|
 |3821B1PE1|kriseev_mikhail|0.4140|
-|3821B1FI1|bodrov_daniil|TOO SLOW|
+|3821B1FI1|bodrov_daniil|TEST FAILED|
 
 # Tasks Done
 ## 3821B1FI1
