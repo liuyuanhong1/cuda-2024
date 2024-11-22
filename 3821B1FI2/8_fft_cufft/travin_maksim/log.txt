@@ -1,0 +1,5 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/8_fft_cufft/travin_maksim/fft_cufft.cu(54): error: a host function call cannot be configured
+      normalize_kernel<<<blocks, threads>>>(d_input, total, inv_n);
+                                           ^
+
+1 error detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI2/8_fft_cufft/travin_maksim/fft_cufft.cu".
