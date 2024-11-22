@@ -1,1 +1,1 @@
-Source file /home/crazyproger/sandbox/cuda-2024/3821B1FI2/1_gelu_omp/travin_maksim/gelu_omp.cpp not found
+Incorrect results, test input_100_100.bin, difference 0.9908354066489928
