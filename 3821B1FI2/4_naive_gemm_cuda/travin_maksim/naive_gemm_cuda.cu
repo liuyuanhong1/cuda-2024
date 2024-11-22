@@ -4,7 +4,7 @@
 
 #define BLOCK_SIZE 16
 
-void CUDA_CHECK(error) {
+void CUDA_CHECK(cudaError_t error) {
     if (error != cudaSuccess) {
         std::cerr << "CUDA Error: " << cudaGetErrorString(error) << " at line " << __LINE__ << std::endl;
         exit(EXIT_FAILURE);
