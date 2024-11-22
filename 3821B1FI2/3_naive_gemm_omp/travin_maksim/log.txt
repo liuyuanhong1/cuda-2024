@@ -1,7 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/3_naive_gemm_omp/travin_maksim/naive_gemm_omp.cpp: In function ‘std::vector<float> NaiveGemmOMP(const std::vector<float>&, const std::vector<float>&, int)’:
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/3_naive_gemm_omp/travin_maksim/naive_gemm_omp.cpp:11:17: error: ‘c’ was not declared in this scope
-   11 |                 c[i * n + j] += a[i * n + k] * b[k * n + j];
-      |                 ^
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/3_naive_gemm_omp/travin_maksim/naive_gemm_omp.cpp:16:12: error: ‘c’ was not declared in this scope
-   16 |     return c;
-      |            ^
