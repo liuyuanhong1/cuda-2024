@@ -1,0 +1,63 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(7): error: incomplete type "void" is not allowed
+  void CUDA_CHECK(error) {
+       ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(7): error: identifier "error" is undefined
+  void CUDA_CHECK(error) {
+                  ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(7): error: expected a ";"
+  void CUDA_CHECK(error) {
+                         ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(51): warning #12-D: parsing restarts here after previous syntax error
+      CUDA_CHECK(cudaMemcpy(c.data(), d_c, bytes, cudaMemcpyDeviceToHost));
+                                                                          ^
+
+Remark: The warnings can be suppressed with "-diag-suppress <warning-number>"
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(53): error: this declaration has no storage class or type specifier
+      CUDA_CHECK(cudaFree(d_a));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(53): error: variable "CUDA_CHECK" has already been defined (previous definition at line 7)
+      CUDA_CHECK(cudaFree(d_a));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(53): error: identifier "d_a" is undefined
+      CUDA_CHECK(cudaFree(d_a));
+                          ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(54): error: this declaration has no storage class or type specifier
+      CUDA_CHECK(cudaFree(d_b));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(54): error: variable "CUDA_CHECK" has already been defined (previous definition at line 7)
+      CUDA_CHECK(cudaFree(d_b));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(54): error: identifier "d_b" is undefined
+      CUDA_CHECK(cudaFree(d_b));
+                          ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(55): error: this declaration has no storage class or type specifier
+      CUDA_CHECK(cudaFree(d_c));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(55): error: variable "CUDA_CHECK" has already been defined (previous definition at line 7)
+      CUDA_CHECK(cudaFree(d_c));
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(55): error: identifier "d_c" is undefined
+      CUDA_CHECK(cudaFree(d_c));
+                          ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(57): error: expected a declaration
+      return c;
+      ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu(58): error: expected a declaration
+  }
+  ^
+
+14 errors detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI2/4_naive_gemm_cuda/travin_maksim/naive_gemm_cuda.cu".
