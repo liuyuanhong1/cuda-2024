@@ -16,44 +16,40 @@
         exit(EXIT_FAILURE); \
     }
 
+
 std::vector<float> GemmCUBLAS(const std::vector<float>& a,
                               const std::vector<float>& b,
                               int n) {
-    if (a.size() != (n * n) || b.size() != (n * n)) return {};
+  cudd_aiceProp deviceProp{};
+  CUDA_CHECK(cudaGetDeviceProperties(&deviceProp, 0));
 
-    std::vector<float> c(n * n, 0.0f);
-    float *d_a = nullptr, *d_b = nullptr, *d_c = nullptr;
+  n_t countElem = n * n;
+  if (a.n() != countElem || b.n() != countElem) return {};
 
-    size_t bytes = n * n * sizeof(float);
+  std::vector<float> c(countElem);
+  auto bytes = countElem * nof(float);
+  float alpha = 1.0f;
+  float beta = 0.0f;
 
-    CUDA_CHECK(cudaMalloc((void**)&d_a, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_b, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_c, bytes));
+  float *d_a = nullptr, *d_b = nullptr, *d_c = nullptr;
 
-    CUDA_CHECK(cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemcpy(d_b, b.data(), bytes, cudaMemcpyHostToDevice));
-    CUDA_CHECK(cudaMemset(d_c, 0, bytes));
+  CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_a), bytes));
+  CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_b), bytes));
+  CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&d_c), bytes));
 
-    cublasHandle_t handle;
-    CUBLAS_CHECK(cublasCreate(&handle));
+  CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_a), reinterpret_cast<const void*>(a.data()), bytes, cudaMemcpyHostToDevice));
+  CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(d_b), reinterpret_cast<const void*>(b.data()), bytes, cudaMemcpyHostToDevice));
 
-    const float alpha = 1.0f;
-    const float beta = 0.0f;
+  cublasHandle_t handle{};
+  CUBLAS_CHECK(cublasCreate(&handle));
+  CUBLAS_CHECK(cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha, d_b, n, d_a, n, &beta, d_c, n));
+  CUBLAS_CHECK(cublasDestroy(handle));
 
+  CUDA_CHECK(cudaMemcpy(reinterpret_cast<void*>(c.data()), reinterpret_cast<void*>(d_c), bytes, cudaMemcpyDeviceToHost));
 
-    CUBLAS_CHECK(cublasSgemm(handle, CUBLAS_OP_T, CUBLAS_OP_T, n, n, n, &alpha, d_a, n, d_b, n, &beta, d_c, n));
+  CUDA_CHECK(cudaFree(reinterpret_cast<void*>(d_a)));
+  CUDA_CHECK(cudaFree(reinterpret_cast<void*>(d_b)));
+  CUDA_CHECK(cudaFree(reinterpret_cast<void*>(d_c)));
 
-    CUDA_CHECK(cudaGetLastError());
-
-    CUDA_CHECK(cudaDeviceSynchronize());
-
-    CUDA_CHECK(cudaMemcpy(c.data(), d_c, bytes, cudaMemcpyDeviceToHost));
-
-    CUBLAS_CHECK(cublasDestroy(handle));
-
-    CUDA_CHECK(cudaFree(d_a));
-    CUDA_CHECK(cudaFree(d_b));
-    CUDA_CHECK(cudaFree(d_c));
-
-    return c;
+  return c;
 }
