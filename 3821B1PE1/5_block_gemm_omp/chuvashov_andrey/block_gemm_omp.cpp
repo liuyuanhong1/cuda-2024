@@ -10,7 +10,7 @@ std::vector<float> BlockGemmOMP(const std::vector<float>& a,
     
     auto countOfBlocks = n / SIZE;
 
-    #pragma omp parallel for shared(a, b, c)
+    #pragma omp parallel for shared(a, b, result)
     for (int i = 0; i < countOfBlocks; i++) {
         for (int j = 0; j < countOfBlocks; j++) {
             for (int k = 0; k < countOfBlocks; k++) {
