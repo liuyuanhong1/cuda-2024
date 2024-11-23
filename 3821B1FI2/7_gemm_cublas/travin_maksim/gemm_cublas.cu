@@ -19,8 +19,9 @@
 std::vector<float> GemmCUBLAS(const std::vector<float>& a,
                               const std::vector<float>& b,
                               int n) {
-    std::vector<float> c(n * n, 0.0f);
+    if (a.size() != (n * n) || b.size() != (n * n)) return {};
 
+    std::vector<float> c(n * n, 0.0f);
     float *d_a = nullptr, *d_b = nullptr, *d_c = nullptr;
 
     size_t bytes = n * n * sizeof(float);
