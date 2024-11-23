@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Chuvashov Andrey
 #include "block_gemm_omp.h"
 
 #include <omp.h>
