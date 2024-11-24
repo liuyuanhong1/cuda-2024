@@ -1,4 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/5_block_gemm_omp/chuvashov_andrey/block_gemm_omp.cpp: In function ‘std::vector<float> BlockGemmOMP(const std::vector<float>&, const std::vector<float>&, int)’:
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/5_block_gemm_omp/chuvashov_andrey/block_gemm_omp.cpp:13:43: error: ‘c’ has not been declared
-   13 |     #pragma omp parallel for shared(a, b, c)
-      |                                           ^
