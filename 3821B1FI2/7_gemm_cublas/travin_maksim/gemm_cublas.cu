@@ -1,8 +1,10 @@
-#include "gemm_cublas.h"
-#include <cuda_runtime.h>
-#include <cublas_v2.h>
-#include <vector>
+#include <cstdlib>
 #include <iostream>
+#include "cublas_v2.h"
+#include "cuda.h"
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include "gemm_cublas.h"
 
 #define CUDA_CHECK(error) \
     if (error != cudaSuccess) { \
@@ -23,11 +25,11 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
   cudd_aiceProp deviceProp{};
   CUDA_CHECK(cudaGetDeviceProperties(&deviceProp, 0));
 
-  n_t countElem = n * n;
-  if (a.n() != countElem || b.n() != countElem) return {};
+  size_t countElem = n * n;
+  if (a.size() != countElem || b.size() != countElem) return {};
 
   std::vector<float> c(countElem);
-  auto bytes = countElem * nof(float);
+  auto bytes = countElem * sizeof(float);
   float alpha = 1.0f;
   float beta = 0.0f;
 
