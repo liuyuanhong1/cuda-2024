@@ -1,25 +1,5 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(23): error: identifier "cudd_aiceProp" is undefined
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(25): error: identifier "cudd_aiceProp" is undefined
     cudd_aiceProp deviceProp{};
     ^
 
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(26): error: identifier "n_t" is undefined
-    n_t countElem = n * n;
-    ^
-
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(27): error: class "std::vector<float, std::allocator<float>>" has no member "n"
-    if (a.n() != countElem || b.n() != countElem) return {};
-          ^
-
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(27): error: class "std::vector<float, std::allocator<float>>" has no member "n"
-    if (a.n() != countElem || b.n() != countElem) return {};
-                                ^
-
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(30): error: type name is not allowed
-    auto bytes = countElem * nof(float);
-                                 ^
-
-/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu(30): error: identifier "nof" is undefined
-    auto bytes = countElem * nof(float);
-                             ^
-
-6 errors detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu".
+1 error detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1FI2/7_gemm_cublas/travin_maksim/gemm_cublas.cu".
