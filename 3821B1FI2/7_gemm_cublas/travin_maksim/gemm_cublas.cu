@@ -22,7 +22,7 @@
 std::vector<float> GemmCUBLAS(const std::vector<float>& a,
                               const std::vector<float>& b,
                               int n) {
-  cudd_aiceProp deviceProp{};
+  cudaDeviceProp deviceProp{};
   CUDA_CHECK(cudaGetDeviceProperties(&deviceProp, 0));
 
   size_t countElem = n * n;
