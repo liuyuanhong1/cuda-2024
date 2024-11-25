@@ -29,15 +29,15 @@ __global__ void BlockGemmKernel(const float* a,
                 b[(i + threadIdx.y) * n + column];
             }
         }
+
+        __syncthreads();
+
+        for (int j = 0; j < SIZE; ++j){
+            current += shared_a[threadIdx.y][j] * shared_b[j][threadIdx.x];
+        }
+
+        __syncthreads();
     }
-
-    __syncthreads();
-
-    for (int j = 0; j < SIZE; j++){
-        current += shared_a[threadIdx.y][j] * shared_b[j][threadIdx.x];
-    }
-
-    __syncthreads();
 
     c[row * n + column] = current;
 }
