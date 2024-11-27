@@ -16,7 +16,17 @@
         exit(EXIT_FAILURE); \
     }
 
-std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
+__global__ void normalize_kernel(cufftComplex* data, int total, float inv_n) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < total) {
+        data[idx].x *= inv_n;
+        data[idx].y *= inv_n;
+    }
+}
+
+std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) { 
+    if (input.empty()) return {};
+
     int n = input.size() / (2 * batch);
 
     std::vector<float> output(input.size(), 0.0f);
@@ -41,13 +51,6 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
 
     float inv_n = 1.0f / static_cast<float>(n);
     int total = n * batch;
-    auto normalize_kernel = [] __global__ (cufftComplex* data, int total, float inv_n) {
-        int idx = blockIdx.x * blockDim.x + threadIdx.x;
-        if (idx < total) {
-            data[idx].x *= inv_n;
-            data[idx].y *= inv_n;
-        }
-    };
 
     int threads = 256;
     int blocks = (total + threads - 1) / threads;
@@ -56,7 +59,6 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
     CUDA_CHECK(cudaDeviceSynchronize());
 
     CUDA_CHECK(cudaMemcpy(output.data(), d_input, bytes, cudaMemcpyDeviceToHost));
-
     CUDA_CHECK(cudaFree(d_input));
     CUDA_CHECK(cudaFree(d_output));
 
