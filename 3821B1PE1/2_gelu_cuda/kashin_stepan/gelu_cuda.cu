@@ -1,51 +1,33 @@
-// Copyright (c) 2024 Kashin Stepan
-
-#include <vector>
-#include <iostream>
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <device_launch_parameters.h>
 #include "gelu_cuda.h"
 
-__global__ void ApplyGelu(const float* input, float* output, size_t length) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void GeluKernel(float *input, float *res, int size) {
+  int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (idx < length) {
-        constexpr float coeff1 = 1.595769122f;
-        constexpr float coeff2 = 0.071354816f;
-
-        float x = input[idx];
-        output[idx] = x * (1 - 1 / (1.0f + __expf(x * (coeff1 + x * x * coeff2))));
-    }
+  float x = input[i];
+  auto expon = __expf(x * fma(__powf(x, 2.0f), GELU_COEF2, GELU_COEF1));
+  
+  res[i] = x * (expon / (1.0f + expon));
 }
 
-std::vector<float> ComputeGeluCUDA(const std::vector<float>& input) {
-    if (input.empty()) return {};
+std::vector<float> GeluCUDA(const std::vector<float> &input) {
+  auto size = input.size();
+  std::vector<float> output(size);
+  float *d_input, *d_output;
 
-    cudaDeviceProp deviceProps;
-    cudaGetDeviceProperties(&deviceProps, 0);
+  cudaMalloc(&d_input, input.size() * sizeof(float));
+  cudaMalloc(&d_output, output.size() * sizeof(float));
+  cudaMemcpy(d_input, input.data(), size * sizeof(float),
+             cudaMemcpyHostToDevice);
 
-    size_t length = input.size();
-    std::vector<float> output(length);
+  int blockSize = 128;
+  int numBlocks = (input.size() + blockSize - 1) / blockSize;
 
-    size_t bytes = length * sizeof(float);
-    int threads = deviceProps.maxThreadsPerBlock;
-    int blocks = (length + threads - 1) / threads;
+  GeluKernel<<<numBlocks, blockSize>>>(d_input, d_output, size);
 
-    float* devInput = nullptr;
-    float* devOutput = nullptr;
-    cudaMalloc(&devInput, bytes);
-    cudaMalloc(&devOutput, bytes);
+  cudaMemcpy(output.data(), d_output, size * sizeof(float),
+             cudaMemcpyDeviceToHost);
 
-    cudaMemcpy(devInput, input.data(), bytes, cudaMemcpyHostToDevice);
-
-    ApplyGelu<<<blocks, threads>>>(devInput, devOutput, length);
-
-    cudaDeviceSynchronize();
-    cudaMemcpy(output.data(), devOutput, bytes, cudaMemcpyDeviceToHost);
-
-    cudaFree(devOutput);
-    cudaFree(devInput);
-
-    return output;
+  cudaFree(d_output);
+  cudaFree(d_input);
+  return output;
 }
