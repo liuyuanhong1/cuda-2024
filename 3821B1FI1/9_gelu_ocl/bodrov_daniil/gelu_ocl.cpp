@@ -16,38 +16,53 @@ namespace {
     std::once_flag initFlag;
 
     void initializeOpenCL(size_t bufferBytes) {
-        // Инициализация платформы и устройства
+        // Get all platforms (drivers)
         std::vector<cl::Platform> platforms;
         cl::Platform::get(&platforms);
-        cl::Platform platform = platforms.front();
+        if (platforms.empty()) {
+            throw std::runtime_error("No OpenCL platforms found.");
+        }
 
+        // Use platform 0
+        cl::Platform platform = platforms[0];
+
+        // Get GPU devices
         std::vector<cl::Device> devices;
         platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+        if (devices.empty()) {
+            throw std::runtime_error("No GPU devices found.");
+        }
+
         device = devices.front();
 
+        // Create context and command queue
         context = cl::Context(device);
         queue = cl::CommandQueue(context, device);
 
-        // Код ядра
+        // OpenCL kernel code
         const std::string kernelSource = R"CLC(
         __kernel void gelu_activation(__global const float* input, __global float* output, const int size) {
             int gid = get_global_id(0);
             if (gid >= size) return;
             float x = input[gid];
-            float y = x * (0.7978846f * (1.0f + 0.044715f * x * x));
-            output[gid] = 0.5f * x * (1.0f + y);
+            // GELU computation
+            float y = 0.5f * x * (1.0f + tanh(0.79788456f * (x + 0.044715f * x * x * x)));
+            output[gid] = y;
         }
         )CLC";
 
-        // Компиляция программы
+        // Build program
         cl::Program::Sources sources;
-        sources.emplace_back(kernelSource);
+        sources.emplace_back(std::move(kernelSource));
         program = cl::Program(context, sources);
-        program.build({ device });
+        if (program.build() != CL_SUCCESS) {
+            std::cerr << "Build log:\n" << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
+        }
 
+        // Create kernel
         kernel = cl::Kernel(program, "gelu_activation");
 
-        // Создание буферов
+        // Create buffers
         bufferInput = cl::Buffer(context, CL_MEM_READ_ONLY, bufferBytes);
         bufferOutput = cl::Buffer(context, CL_MEM_WRITE_ONLY, bufferBytes);
     }
@@ -61,7 +76,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
     size_t dataSize = input.size();
     size_t bufferBytes = dataSize * sizeof(float);
 
-    // Инициализация OpenCL один раз
+    // Initialize OpenCL once
     try {
         std::call_once(initFlag, initializeOpenCL, bufferBytes);
     } catch (const std::exception& e) {
@@ -69,29 +84,30 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
         return {};
     }
 
-    // Если буферы меньше необходимого размера, переинициализируем их
+    // If buffers are smaller than needed, re-create them
     if (bufferInput.getInfo<CL_MEM_SIZE>() < bufferBytes) {
         bufferInput = cl::Buffer(context, CL_MEM_READ_ONLY, bufferBytes);
         bufferOutput = cl::Buffer(context, CL_MEM_WRITE_ONLY, bufferBytes);
     }
 
-    // Копирование данных во входной буфер
+    // Copy data to input buffer
     queue.enqueueWriteBuffer(bufferInput, CL_FALSE, 0, bufferBytes, input.data());
 
-    // Установка аргументов ядра
+    // Set kernel arguments
     kernel.setArg(0, bufferInput);
     kernel.setArg(1, bufferOutput);
     kernel.setArg(2, static_cast<int>(dataSize));
 
-    // Оптимизация размеров рабочих групп
+    // Determine global and local work sizes
     size_t localRangeSize = 256;
+    size_t globalRangeSize = ((dataSize + localRangeSize - 1) / localRangeSize) * localRangeSize;
+    cl::NDRange globalRange(globalRangeSize);
     cl::NDRange localRange(localRangeSize);
-    cl::NDRange globalRange(((dataSize + localRangeSize - 1) / localRangeSize) * localRangeSize);
 
-    // Запуск ядра
+    // Execute kernel
     queue.enqueueNDRangeKernel(kernel, cl::NullRange, globalRange, localRange);
 
-    // Чтение результата
+    // Read results
     std::vector<float> output(dataSize);
     queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, bufferBytes, output.data());
 
