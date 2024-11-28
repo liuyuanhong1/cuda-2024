@@ -1,5 +1,3 @@
-// Copyright (c) 2024 Kashin Stepan
-// Разрешаю копировать и взаимствовать, если указан оригинальный автор: "// Copyright (c) 2024 Kashin Stepan -> Ivanov Ivan"
 #ifndef __GELU_OMP_H
 #define __GELU_OMP_H
 
