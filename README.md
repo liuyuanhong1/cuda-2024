@@ -414,7 +414,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI2|zakharov_artem|0.6916|
 |3821B1FI3|sadikov_damir|0.6978|
 |3821B1FI1|bodrov_daniil|0.7005|
-|3821B1PE1|kashin_stepan|0.7031|
 |3821B1FI3|sharapov_georgiy|0.7042|
 |3821B1PE3|Kokin_Ivan|0.7088|
 |3821B1FI1|veselov_ilya|0.7132|
@@ -438,6 +437,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE3|smirnov_pavel|1.4899|
 |3821B1PE1|vanushkin_dmitry|1.5001|
 |3821B1FI1|mirzakhmedov_alexander|TEST FAILED|
+|3821B1PE1|kashin_stepan|BUILD FAILED|
 
 ## 2_gelu_cuda (134217728 elements)
 |Group|Name|Result|
@@ -474,13 +474,13 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|kiselev_igor|0.2607|
 |3821B1FI3|ivanov_nikita|0.2627|
 |3821B1FI3|korablev_nikita|0.2653|
+|3821B1PE1|kashin_stepan|0.2667|
 |3821B1FI3|simonyan_suren|0.2671|
 |3821B1PE1|khodyrev_fedor|0.2716|
 |3821B1PE1|yurin_andrey|0.2718|
 |3821B1PE1|khramov_ivan|0.2879|
 |3821B1PE1|pozdnyakov_vasya|0.2983|
 |3821B1PE1|vanushkin_dmitry|0.3671|
-|3821B1PE1|kashin_stepan|BUILD FAILED|
 |3821B1PE2|derun_andrei|TEST FAILED|
 
 ## 3_naive_gemm_omp (1024 elements)
