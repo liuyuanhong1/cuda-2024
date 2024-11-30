@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Chuvashov Andrey
 #ifndef __GELU_OCL_H
 #define __GELU_OCL_H
 

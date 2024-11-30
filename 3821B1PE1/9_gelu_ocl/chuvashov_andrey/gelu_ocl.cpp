@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Chuvashov Andrey
 #include "gelu_ocl.h"
 
 #include <CL/cl.h>
