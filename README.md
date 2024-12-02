@@ -746,6 +746,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI2|travin_maksim|0.4418|
 |3821B1FI1|bodrov_daniil|TOO SLOW|
 |3821B1PE1|chuvashov_andrey|BUILD FAILED|
+|3821B1PE2|belan_vadim|BUILD FAILED|
 
 # Tasks Done
 ## 3821B1FI1
@@ -806,6 +807,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3821B1PE2
 |Group|Name|Passed|
 |-----|----|------|
+|3821B1PE2|belan_vadim|0/9|
 |3821B1PE2|derun_andrei|1/9|
 |3821B1PE2|savchuk_anton|3/9|
 
