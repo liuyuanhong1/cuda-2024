@@ -485,6 +485,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|pozdnyakov_vasya|0.2983|
 |3821B1PE1|vanushkin_dmitry|0.3671|
 |3821B1PE2|derun_andrei|TEST FAILED|
+|3821B1PE2|belan_vadim|BUILD FAILED|
 
 ## 3_naive_gemm_omp (1024 elements)
 |Group|Name|Result|
