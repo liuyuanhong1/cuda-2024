@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kulaev Zhenya
+// Copyright (c) 2024 Soloninko Andrey
 #ifndef __GELU_CUDA_H
 #define __GELU_CUDA_H
 
