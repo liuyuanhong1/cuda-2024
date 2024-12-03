@@ -1,9 +1,8 @@
 // Copyright (c) 2024 Chuvashov Andrey
 #include "gelu_ocl.h"
 
-#include <CL/cl.h>
+#include <CL/opencl.hpp>
 #include <CL/cl_platform.h>
-#include <CL/opencl.h>
 #include <string>
 #include <utility>
 #include <math.h>
@@ -83,7 +82,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
         CL_TRUE,
         0,
         input.size() * sizeof(*input.data()),
-        output.data()
+        result.data()
     );
 
     return result;
