@@ -1,122 +1,99 @@
-#include "block_gemm_cuda.h"
 #include <cuda_runtime.h>
 #include <vector>
-#include <stdexcept>
-#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define BLOCK_SIZE 16
 
-__global__ void blockGemmKernel(const float* __restrict__ A,
-                                const float* __restrict__ B,
-                                float* __restrict__ C,
-                                int n) {
-    __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
-    __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
+#define CHECK_CUDA_ERROR(call)                                        \
+    do {                                                              \
+        cudaError_t err = call;                                       \
+        if (err != cudaSuccess) {                                     \
+            fprintf(stderr, "CUDA error at %s %d: %s\n", __FILE__,    \
+                    __LINE__, cudaGetErrorString(err));               \
+            exit(EXIT_FAILURE);                                       \
+        }                                                             \
+    } while (0)
 
-    int row = blockIdx.y * BLOCK_SIZE + threadIdx.y;
-    int col = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+__global__ void MatrixMulKernel(const float* A, const float* B, float* C, int n) {
+    int blockRow = blockIdx.y;
+    int blockCol = blockIdx.x;
+
+    int threadRow = threadIdx.y;
+    int threadCol = threadIdx.x;
+
+    int globalRow = blockRow * BLOCK_SIZE + threadRow;
+    int globalCol = blockCol * BLOCK_SIZE + threadCol;
 
     float Cvalue = 0.0f;
 
     int numTiles = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
-    for (int t = 0; t < numTiles; ++t) {
-        if (row < n && (t * BLOCK_SIZE + threadIdx.x) < n)
-            As[threadIdx.y][threadIdx.x] = A[row * n + t * BLOCK_SIZE + threadIdx.x];
-        else
-            As[threadIdx.y][threadIdx.x] = 0.0f;
+    for (int m = 0; m < numTiles; ++m) {
+        __shared__ float As[BLOCK_SIZE][BLOCK_SIZE];
+        __shared__ float Bs[BLOCK_SIZE][BLOCK_SIZE];
 
-        if (col < n && (t * BLOCK_SIZE + threadIdx.y) < n)
-            Bs[threadIdx.y][threadIdx.x] = B[(t * BLOCK_SIZE + threadIdx.y) * n + col];
+        int A_row = globalRow;
+        int A_col = m * BLOCK_SIZE + threadCol;
+        int B_row = m * BLOCK_SIZE + threadRow;
+        int B_col = globalCol;
+
+        if (A_row < n && A_col < n)
+            As[threadRow][threadCol] = A[A_row * n + A_col];
         else
-            Bs[threadIdx.y][threadIdx.x] = 0.0f;
+            As[threadRow][threadCol] = 0.0f;
+
+        if (B_row < n && B_col < n)
+            Bs[threadRow][threadCol] = B[B_row * n + B_col];
+        else
+            Bs[threadRow][threadCol] = 0.0f;
 
         __syncthreads();
 
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
-            Cvalue += As[threadIdx.y][k] * Bs[k][threadIdx.x];
-        }
+        for (int e = 0; e < BLOCK_SIZE; ++e)
+            Cvalue += As[threadRow][e] * Bs[e][threadCol];
 
         __syncthreads();
     }
 
-    if (row < n && col < n) {
-        C[row * n + col] = Cvalue;
-    }
+    if (globalRow < n && globalCol < n)
+        C[globalRow * n + globalCol] = Cvalue;
 }
 
 std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
                                  const std::vector<float>& b,
                                  int n) {
-    if (a.size() != static_cast<size_t>(n * n) || b.size() != static_cast<size_t>(n * n)) {
-        throw std::invalid_argument("Input matrices must be of size n x n.");
-    }
-
-    std::vector<float> c(n * n, 0.0f);
-
-    float *d_A = nullptr, *d_B = nullptr, *d_C = nullptr;
-
     size_t size = n * n * sizeof(float);
 
-    cudaError_t err;
-    err = cudaMalloc((void**)&d_A, size);
-    if (err != cudaSuccess) {
-        throw std::runtime_error("Failed to allocate device memory for matrix A.");
-    }
+    float* d_A = nullptr;
+    float* d_B = nullptr;
+    float* d_C = nullptr;
 
-    err = cudaMalloc((void**)&d_B, size);
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        throw std::runtime_error("Failed to allocate device memory for matrix B.");
-    }
+    CHECK_CUDA_ERROR(cudaMalloc((void**)&d_A, size));
+    CHECK_CUDA_ERROR(cudaMalloc((void**)&d_B, size));
+    CHECK_CUDA_ERROR(cudaMalloc((void**)&d_C, size));
 
-    err = cudaMalloc((void**)&d_C, size);
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        cudaFree(d_B);
-        throw std::runtime_error("Failed to allocate device memory for matrix C.");
-    }
+    CHECK_CUDA_ERROR(cudaMemcpy(d_A, a.data(), size, cudaMemcpyHostToDevice));
+    CHECK_CUDA_ERROR(cudaMemcpy(d_B, b.data(), size, cudaMemcpyHostToDevice));
 
-    err = cudaMemcpy(d_A, a.data(), size, cudaMemcpyHostToDevice);
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-        throw std::runtime_error("Failed to copy matrix A to device.");
-    }
+    dim3 blockDim(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 gridDim((n + BLOCK_SIZE - 1) / BLOCK_SIZE, (n + BLOCK_SIZE - 1) / BLOCK_SIZE);
 
-    err = cudaMemcpy(d_B, b.data(), size, cudaMemcpyHostToDevice);
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-        throw std::runtime_error("Failed to copy matrix B to device.");
-    }
+    printf("Launching kernel with gridDim (%d, %d) and blockDim (%d, %d)\n",
+           gridDim.x, gridDim.y, blockDim.x, blockDim.y);
 
-    dim3 dimBlock(BLOCK_SIZE, BLOCK_SIZE);
-    dim3 dimGrid((n + BLOCK_SIZE - 1) / BLOCK_SIZE,
-                 (n + BLOCK_SIZE - 1) / BLOCK_SIZE);
+    MatrixMulKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
 
-    blockGemmKernel<<<dimGrid, dimBlock>>>(d_A, d_B, d_C, n);
+    CHECK_CUDA_ERROR(cudaGetLastError());
 
-    err = cudaGetLastError();
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-        throw std::runtime_error("Failed to launch blockGemmKernel.");
-    }
+    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
 
-    err = cudaMemcpy(c.data(), d_C, size, cudaMemcpyDeviceToHost);
-    if (err != cudaSuccess) {
-        cudaFree(d_A);
-        cudaFree(d_B);
-        cudaFree(d_C);
-        throw std::runtime_error("Failed to copy matrix C from device to host.");
-    }
+    std::vector<float> c(n * n);
 
-    cudaFree(d_A);
-    cudaFree(d_B);
-    cudaFree(d_C);
+    CHECK_CUDA_ERROR(cudaMemcpy(c.data(), d_C, size, cudaMemcpyDeviceToHost));
+
+    CHECK_CUDA_ERROR(cudaFree(d_A));
+    CHECK_CUDA_ERROR(cudaFree(d_B));
+    CHECK_CUDA_ERROR(cudaFree(d_C));
 
     return c;
 }
