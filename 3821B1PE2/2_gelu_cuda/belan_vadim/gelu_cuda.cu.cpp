@@ -1,53 +1,49 @@
 #include "gelu_cuda.h"
-
 #include <cuda_runtime.h>
-#include <vector>
 #include <cmath>
-#include <stdexcept>
-#include <iostream>
+#include <algorithm>
 
-#define CUDA_CHECK_ERROR(call)                                          \
-    do {                                                                \
-        cudaError_t err = call;                                         \
-        if (err != cudaSuccess) {                                       \
-            throw std::runtime_error(std::string("CUDA Error: ") +     \
-                                     cudaGetErrorString(err));          \
-        }                                                               \
-    } while (0)
-
-__global__ void gelu_kernel(const float* input, float* output, size_t size) {
+__global__ void geluKernel(const float* input, float* output, int size) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx < size) {
         float x = input[idx];
-        float cdf = 0.5f * (1.0f + tanhf(0.7978845608f * (x + 0.044715f * x * x * x)));
+        float cdf = 0.5f * (1.0f + tanhf(0.7978845608028654f * (x + 0.044715f * x * x * x))); // sqrt(2/pi) ≈ 0.79788
         output[idx] = x * cdf;
     }
 }
 
 std::vector<float> GeluCUDA(const std::vector<float>& input) {
-    size_t size = input.size();
-    size_t bytes = size * sizeof(float);
-    
+    int size = input.size();
+
+    float* h_input = nullptr;
+    float* h_output = nullptr;
+
+    h_input = new float[size];
+    h_output = new float[size];
+
+    std::copy(input.begin(), input.end(), h_input);
+
     float* d_input = nullptr;
     float* d_output = nullptr;
-    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_input, bytes));
-    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_output, bytes));
-    
-    CUDA_CHECK_ERROR(cudaMemcpy(d_input, input.data(), bytes, cudaMemcpyHostToDevice));
-    
-    int threads = 256;
-    int blocks = (size + threads - 1) / threads;
-    
-    gelu_kernel<<<blocks, threads>>>(d_input, d_output, size);
-    
-    CUDA_CHECK_ERROR(cudaGetLastError());
-    
-    std::vector<float> output(size);
-    
-    CUDA_CHECK_ERROR(cudaMemcpy(output.data(), d_output, bytes, cudaMemcpyDeviceToHost));
-    
-    CUDA_CHECK_ERROR(cudaFree(d_input));
-    CUDA_CHECK_ERROR(cudaFree(d_output));
-    
-    return output;
+
+    cudaMalloc(&d_input, size * sizeof(float));
+    cudaMalloc(&d_output, size * sizeof(float));
+
+    cudaMemcpy(d_input, h_input, size * sizeof(float), cudaMemcpyHostToDevice);
+
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+
+    geluKernel<<<blocksPerGrid, threadsPerBlock>>>(d_input, d_output, size);
+
+    cudaMemcpy(h_output, d_output, size * sizeof(float), cudaMemcpyDeviceToHost);
+
+    std::vector<float> result(h_output, h_output + size);
+
+    cudaFree(d_input);
+    cudaFree(d_output);
+    delete[] h_input;
+    delete[] h_output;
+
+    return result;
 }
