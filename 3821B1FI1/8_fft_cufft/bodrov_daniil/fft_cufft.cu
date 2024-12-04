@@ -42,6 +42,15 @@ const char* cufftGetErrorString(cufftResult error) {
     }
 }
 
+// CUDA-ядро для нормализации данных на устройстве
+__global__ void normalize(cufftComplex* data, int size, float norm_factor) {
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    if (idx < size) {
+        data[idx].x *= norm_factor;
+        data[idx].y *= norm_factor;
+    }
+}
+
 std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
     // Проверка корректности размера входных данных
     if (input.size() % (2 * batch) != 0) {
@@ -51,57 +60,57 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
     // Вычисление размера одного сигнала
     int n = input.size() / (2 * batch);
 
-    // Размер данных в байтах
-    size_t bytes = sizeof(float) * 2 * n * batch;
+    // Общее количество комплексных чисел
+    int total_elements = n * batch;
 
-    // Указатели на устройства
-    cufftComplex *d_input = nullptr;
-    cufftComplex *d_forward = nullptr;
-    cufftComplex *d_inverse = nullptr;
+    // Размер данных в байтах
+    size_t bytes = sizeof(cufftComplex) * total_elements;
+
+    // Указатель на данные на устройстве
+    cufftComplex* d_data = nullptr;
 
     // Выделение памяти на устройстве
-    CUDA_CHECK(cudaMalloc((void**)&d_input, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_forward, bytes));
-    CUDA_CHECK(cudaMalloc((void**)&d_inverse, bytes));
+    CUDA_CHECK(cudaMalloc((void**)&d_data, bytes));
 
     // Копирование данных с хоста на устройство
-    CUDA_CHECK(cudaMemcpy(d_input, input.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_CHECK(cudaMemcpy(d_data, input.data(), bytes, cudaMemcpyHostToDevice));
 
     // Создание дескриптора cuFFT
-    cufftHandle plan_forward;
-    cufftHandle plan_inverse;
+    cufftHandle plan;
 
-    // План для прямого FFT
-    CUFFT_CHECK(cufftPlan1d(&plan_forward, n, CUFFT_C2C, batch));
+    // Создание плана для FFT
+    CUFFT_CHECK(cufftPlan1d(&plan, n, CUFFT_C2C, batch));
 
-    // План для обратного FFT
-    CUFFT_CHECK(cufftPlan1d(&plan_inverse, n, CUFFT_C2C, batch));
+    // Выполнение прямого FFT (in-place)
+    CUFFT_CHECK(cufftExecC2C(plan, d_data, d_data, CUFFT_FORWARD));
 
-    // Выполнение прямого FFT: d_input -> d_forward
-    CUFFT_CHECK(cufftExecC2C(plan_forward, d_input, d_forward, CUFFT_FORWARD));
+    // Выполнение обратного FFT (in-place)
+    CUFFT_CHECK(cufftExecC2C(plan, d_data, d_data, CUFFT_INVERSE));
 
-    // Выполнение обратного FFT: d_forward -> d_inverse
-    CUFFT_CHECK(cufftExecC2C(plan_inverse, d_forward, d_inverse, CUFFT_INVERSE));
+    // Нормализация результата на устройстве
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (total_elements + threadsPerBlock - 1) / threadsPerBlock;
+    float norm_factor = 1.0f / static_cast<float>(n);
 
-    // Освобождение планов
-    CUFFT_CHECK(cufftDestroy(plan_forward));
-    CUFFT_CHECK(cufftDestroy(plan_inverse));
+    normalize<<<blocksPerGrid, threadsPerBlock>>>(d_data, total_elements, norm_factor);
+
+    // Проверка на ошибки после запуска ядра
+    CUDA_CHECK(cudaGetLastError());
+
+    // Синхронизация устройства
+    CUDA_CHECK(cudaDeviceSynchronize());
 
     // Выделение памяти для результата на хосте
-    std::vector<float> output(2 * n * batch);
+    std::vector<float> output(2 * total_elements);
 
     // Копирование результата с устройства на хост
-    CUDA_CHECK(cudaMemcpy(output.data(), d_inverse, bytes, cudaMemcpyDeviceToHost));
+    CUDA_CHECK(cudaMemcpy(output.data(), d_data, bytes, cudaMemcpyDeviceToHost));
+
+    // Освобождение плана
+    CUFFT_CHECK(cufftDestroy(plan));
 
     // Освобождение памяти на устройстве
-    CUDA_CHECK(cudaFree(d_input));
-    CUDA_CHECK(cudaFree(d_forward));
-    CUDA_CHECK(cudaFree(d_inverse));
-
-    // Нормализация результата
-    for(int i = 0; i < 2 * n * batch; ++i) {
-        output[i] /= static_cast<float>(n);
-    }
+    CUDA_CHECK(cudaFree(d_data));
 
     return output;
 }

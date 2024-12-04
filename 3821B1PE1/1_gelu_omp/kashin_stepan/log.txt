@@ -1,0 +1,4 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kashin_stepan/gelu_omp.cpp:1:10: fatal error: gelu_omp.hpp: No such file or directory
+    1 | #include "gelu_omp.hpp"
+      |          ^~~~~~~~~~~~~~
+compilation terminated.
