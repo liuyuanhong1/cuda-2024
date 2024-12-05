@@ -4,6 +4,6 @@
 
 #include <vector>
 
-std::vector<float> FFTCUFFT(const std::vector<float>& input_data, int batch_size);
+std::vector<float> FffCUFFT(const std::vector<float>& input, int batch);
 
 #endif  // __FFT_CUFFT_H
