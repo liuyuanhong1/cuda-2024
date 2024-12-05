@@ -9,15 +9,15 @@
         cudaError_t err = call;                                           \
         if (err != cudaSuccess) {                                         \
             throw std::runtime_error(std::string("CUDA Error: ") +        \
-                                     cudaGetErrorString(err));            \
+                                    cudaGetErrorString(err));            \
         }                                                                 \
     } while (0)
 
 __global__
 void NaiveGemmKernel(const float* __restrict__ a,
-                     const float* __restrict__ b_T,
-                     float* __restrict__ c,
-                     int n) {
+                    const float* __restrict__ b_T,
+                    float* __restrict__ c,
+                    int n) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -31,8 +31,8 @@ void NaiveGemmKernel(const float* __restrict__ a,
 }
 
 std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
-                                 const std::vector<float>& b,
-                                 int n) {
+                                const std::vector<float>& b,
+                                int n) {
     if (a.size() != static_cast<size_t>(n * n) ||
         b.size() != static_cast<size_t>(n * n)) {
         throw std::invalid_argument("Input matrices must be of size n x n.");
@@ -56,7 +56,7 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
 
     dim3 blockDim(16, 16);
     dim3 gridDim((n + blockDim.x - 1) / blockDim.x,
-                 (n + blockDim.y - 1) / blockDim.y);
+                (n + blockDim.y - 1) / blockDim.y);
 
     NaiveGemmKernel<<<gridDim, blockDim>>>(d_a, d_b_T, d_c, n);
 
@@ -72,4 +72,3 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
 
     return c;
 }
-
