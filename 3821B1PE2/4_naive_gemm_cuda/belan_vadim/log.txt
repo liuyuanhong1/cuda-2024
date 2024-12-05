@@ -1,1 +1,5 @@
-Your application is too slow (> 2 seconds)
+/usr/bin/ld: /tmp/tmpxft_00000c39_00000000-18_main.o: in function `main':
+tmpxft_00000c39_00000000-10_main.cudafe1.cpp:(.text.startup+0x178): undefined reference to `NaiveGemmCUDA(std::vector<float, std::allocator<float> > const&, std::vector<float, std::allocator<float> > const&, int)'
+/usr/bin/ld: tmpxft_00000c39_00000000-10_main.cudafe1.cpp:(.text.startup+0x333): undefined reference to `NaiveGemmCUDA(std::vector<float, std::allocator<float> > const&, std::vector<float, std::allocator<float> > const&, int)'
+/usr/bin/ld: tmpxft_00000c39_00000000-10_main.cudafe1.cpp:(.text.startup+0x355): undefined reference to `NaiveGemmCUDA(std::vector<float, std::allocator<float> > const&, std::vector<float, std::allocator<float> > const&, int)'
+collect2: error: ld returned 1 exit status
