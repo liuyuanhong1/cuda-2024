@@ -1,20 +1,25 @@
+#include "gelu_omp.h"
 #include <cmath>
+#include <omp.h>
 
-std::vector<float> GeluOMP(const std::vector<float> &input) {
-  if (input.empty()) return {};
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
-  constexpr float constOne = 1.595769122f;
-  constexpr float constTwo = constOne * 0.044715f;
+std::vector<float> GeluOMP(const std::vector<float>& input) {
+    size_t n = input.size();
+    std::vector<float> output(n);
 
-  auto size = input.size();
-  std::vector<float> output(size);
+    const float sqrt_2_over_pi = std::sqrt(2.0 / M_PI);
 
-#pragma omp parallel for
-  for (size_t i = 0; i < size; ++i) {
-    float val = input[i];
-    float tmp = val * (constOne + val * val * constTwo);
-    output[i] = val - val / (1.0f + std::exp(tmp));
-  }
+    #pragma omp parallel for
+    for (size_t i = 0; i < n; ++i) {
+        float x = input[i];
+        float x_cubed = x * x * x;
+        float tanh_arg = sqrt_2_over_pi * (x + 0.044715 * x_cubed);
+        float gelu_val = 0.5f * x * (1.0f + std::tanh(tanh_arg));
+        output[i] = gelu_val;
+    }
 
-  return output;
+    return output;
 }
