@@ -2,15 +2,15 @@
 #include <cmath>
 #include <omp.h>
 
-#ifndef PI
-#define PI 3.14159265358979323846
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
 #endif
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
     size_t m = input.size();
     std::vector<float> out(m);
 
-    const float sqrt = std::sqrt(2.0 / PI);
+    const float sqrt = std::sqrt(2.0 / M_PI);
 
 #pragma omp parallel for
     for (size_t i = 0; i < m; ++i) {
