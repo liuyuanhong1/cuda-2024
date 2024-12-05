@@ -9,66 +9,81 @@
         cudaError_t err = call;                                           \
         if (err != cudaSuccess) {                                         \
             throw std::runtime_error(std::string("CUDA Error: ") +        \
-                                    cudaGetErrorString(err));            \
+                                    cudaGetErrorString(err));             \
         }                                                                 \
     } while (0)
 
-__global__
-void NaiveGemmKernel(const float* __restrict__ a,
-                    const float* __restrict__ b_T,
-                    float* __restrict__ c,
-                    int n) {
-    int row = blockIdx.y * blockDim.y + threadIdx.y;
-    int col = blockIdx.x * blockDim.x + threadIdx.x;
+#define TILE_SIZE 16
 
-    if (row < n && col < n) {
-        float sum = 0.0f;
-        for (int k = 0; k < n; ++k) {
-            sum += a[row * n + k] * b_T[col * n + k];
+__global__
+void TiledGemmKernel(const float* __restrict__ A,
+                     const float* __restrict__ B,
+                     float* __restrict__ C,
+                     int n) {
+    __shared__ float As[TILE_SIZE][TILE_SIZE];
+    __shared__ float Bs[TILE_SIZE][TILE_SIZE];
+
+    int row = blockIdx.y * TILE_SIZE + threadIdx.y;
+    int col = blockIdx.x * TILE_SIZE + threadIdx.x;
+
+    float sum = 0.0f;
+
+    for (int t = 0; t < (n + TILE_SIZE - 1) / TILE_SIZE; ++t) {
+        if (row < n && t * TILE_SIZE + threadIdx.x < n)
+            As[threadIdx.y][threadIdx.x] = A[row * n + t * TILE_SIZE + threadIdx.x];
+        else
+            As[threadIdx.y][threadIdx.x] = 0.0f;
+
+        if (col < n && t * TILE_SIZE + threadIdx.y < n)
+            Bs[threadIdx.y][threadIdx.x] = B[(t * TILE_SIZE + threadIdx.y) * n + col];
+        else
+            Bs[threadIdx.y][threadIdx.x] = 0.0f;
+
+        __syncthreads();
+
+#pragma unroll
+        for (int k = 0; k < TILE_SIZE; ++k) {
+            sum += As[threadIdx.y][k] * Bs[k][threadIdx.x];
         }
-        c[row * n + col] = sum;
+
+        __syncthreads();
     }
+
+    if (row < n && col < n)
+        C[row * n + col] = sum;
 }
 
-std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
-                                const std::vector<float>& b,
-                                int n) {
-    if (a.size() != static_cast<size_t>(n * n) ||
-        b.size() != static_cast<size_t>(n * n)) {
+std::vector<float> OptimizedGemmCUDA(const std::vector<float>& A,
+                                     const std::vector<float>& B,
+                                     int n) {
+    if (A.size() != static_cast<size_t>(n * n) ||
+        B.size() != static_cast<size_t>(n * n)) {
         throw std::invalid_argument("Input matrices must be of size n x n.");
     }
 
-    std::vector<float> b_T(n * n);
-    for (int row = 0; row < n; ++row) {
-        for (int col = 0; col < n; ++col) {
-            b_T[col * n + row] = b[row * n + col];
-        }
-    }
-
-    float *d_a = nullptr, *d_b_T = nullptr, *d_c = nullptr;
+    float *d_A = nullptr, *d_B = nullptr, *d_C = nullptr;
     size_t bytes = n * n * sizeof(float);
-    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_a, bytes));
-    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_b_T, bytes));
-    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_c, bytes));
+    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_A, bytes));
+    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_B, bytes));
+    CUDA_CHECK_ERROR(cudaMalloc((void**)&d_C, bytes));
 
-    CUDA_CHECK_ERROR(cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice));
-    CUDA_CHECK_ERROR(cudaMemcpy(d_b_T, b_T.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_CHECK_ERROR(cudaMemcpy(d_A, A.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_CHECK_ERROR(cudaMemcpy(d_B, B.data(), bytes, cudaMemcpyHostToDevice));
 
-    dim3 blockDim(16, 16);
-    dim3 gridDim((n + blockDim.x - 1) / blockDim.x,
-                (n + blockDim.y - 1) / blockDim.y);
+    dim3 blockDim(TILE_SIZE, TILE_SIZE);
+    dim3 gridDim((n + TILE_SIZE - 1) / TILE_SIZE, (n + TILE_SIZE - 1) / TILE_SIZE);
 
-    NaiveGemmKernel<<<gridDim, blockDim>>>(d_a, d_b_T, d_c, n);
+    TiledGemmKernel<<<gridDim, blockDim>>>(d_A, d_B, d_C, n);
 
     CUDA_CHECK_ERROR(cudaGetLastError());
 
-    std::vector<float> c(n * n);
+    std::vector<float> C(n * n);
 
-    CUDA_CHECK_ERROR(cudaMemcpy(c.data(), d_c, bytes, cudaMemcpyDeviceToHost));
+    CUDA_CHECK_ERROR(cudaMemcpy(C.data(), d_C, bytes, cudaMemcpyDeviceToHost));
 
-    CUDA_CHECK_ERROR(cudaFree(d_a));
-    CUDA_CHECK_ERROR(cudaFree(d_b_T));
-    CUDA_CHECK_ERROR(cudaFree(d_c));
+    CUDA_CHECK_ERROR(cudaFree(d_A));
+    CUDA_CHECK_ERROR(cudaFree(d_B));
+    CUDA_CHECK_ERROR(cudaFree(d_C));
 
-    return c;
+    return C;
 }
