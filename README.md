@@ -842,6 +842,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI1|bodrov_daniil|TOO SLOW|
 |3821B1FI1|bonyuk_peter|BUILD FAILED|
 |3821B1PE1|chuvashov_andrey|BUILD FAILED|
+|3821B1PE1|moiseev_nikita|BUILD FAILED|
 |3821B1PE2|belan_vadim|BUILD FAILED|
 
 # Tasks Done
@@ -902,6 +903,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|khramov_ivan|**9/9**|
 |3821B1PE1|kiselev_igor|7/9|
 |3821B1PE1|kriseev_mikhail|**9/9**|
+|3821B1PE1|moiseev_nikita|0/9|
 |3821B1PE1|morgachev_stepan|4/9|
 |3821B1PE1|pozdnyakov_vasya|**9/9**|
 |3821B1PE1|savchuk_anton|1/9|
