@@ -1,1 +1,1 @@
-Source file /home/crazyproger/sandbox/cuda-2024/3821B1PE2/8_fft_cufft/belan_vadim/fft_cufft.cu not found
+Your application is too slow (> 2 seconds)
