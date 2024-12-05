@@ -1,7 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1FI3/1_gelu_omp/ryabkov_vladislav/gelu_omp.cpp:3:6: error: ‘vector’ in namespace ‘std’ does not name a template type
-    3 | std::vector<float> GeluOMP(const std::vector<float> &input) {
-      |      ^~~~~~
-/home/crazyproger/sandbox/cuda-2024/3821B1FI3/1_gelu_omp/ryabkov_vladislav/gelu_omp.cpp:2:1: note: ‘std::vector’ is defined in header ‘<vector>’; did you forget to ‘#include <vector>’?
-    1 | #include <cmath>
-  +++ |+#include <vector>
-    2 | 
