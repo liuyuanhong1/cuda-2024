@@ -4,6 +4,6 @@
 
 #include <vector>
 
-std::vector<float> GELU_OCL(const std::vector<float>& input_data);
+std::vector<float> GeluOCL(const std::vector<float>& input);
 
 #endif  // __GELU_OCL_H
