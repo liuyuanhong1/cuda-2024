@@ -816,6 +816,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kuznetsov_artyom|0.1375|
 |3821B1FI3|kulikov_artem|0.1375|
 |3821B1FI3|polozov_vladislav|0.1379|
+|3821B1PE1|moiseev_nikita|0.1384|
 |3821B1FI3|benduyzhko_tatiana|0.1388|
 |3821B1FI1|akopyan_zal|0.1396|
 |3821B1PE1|chuvashov_andrey|0.1400|
@@ -845,7 +846,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |REF|REF|0.2309|
 |3821B1PE2|zhatkin_vyacheslav|0.3332|
 |3821B1PE2|savchuk_anton|0.3804|
-|3821B1PE1|moiseev_nikita|BUILD FAILED|
 |3821B1FI1|bonyuk_peter|BUILD FAILED|
 |3821B1PE2|derun_andrei|RUN FAILED|
 
@@ -955,7 +955,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|khramov_ivan|**9/9**|
 |3821B1PE1|kiselev_igor|7/9|
 |3821B1PE1|kriseev_mikhail|**9/9**|
-|3821B1PE1|moiseev_nikita|8/9|
+|3821B1PE1|moiseev_nikita|**9/9**|
 |3821B1PE1|morgachev_stepan|7/9|
 |3821B1PE1|pozdnyakov_vasya|**9/9**|
 |3821B1PE1|saratova_marina|**9/9**|
