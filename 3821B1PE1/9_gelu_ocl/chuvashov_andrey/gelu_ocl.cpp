@@ -63,7 +63,7 @@ __kernel void GeluOCLKernel(__global const float* input, __global float* output,
         CL_TRUE,
         0,
         bytesSize,
-        input_size
+        input.data()
     );
 
     kernel.setArg(0, bufferInput);
