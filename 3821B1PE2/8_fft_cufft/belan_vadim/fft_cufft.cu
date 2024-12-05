@@ -4,6 +4,14 @@
 #include <iostream>
 #include <stdexcept>
 
+__global__ void normalize(cufftComplex* data, int num_elements, float norm_factor) {
+    int idx = blockDim.x * blockIdx.x + threadIdx.x;
+    if (idx < num_elements) {
+        data[idx].x *= norm_factor;
+        data[idx].y *= norm_factor;
+    }
+}
+
 std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
     int n = input.size() / (2 * batch);
 
@@ -11,52 +19,42 @@ std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
         throw std::invalid_argument("Input size must be 2 * n * batch, where n is the number of elements per signal.");
     }
 
-    cufftComplex* d_input;
-    cufftComplex* d_output;
-    size_t input_size = 2 * n * batch * sizeof(float);
+    cufftComplex* d_data;
+    size_t input_size = input.size() * sizeof(float);
 
-    cudaMalloc(&d_input, input_size);
-    cudaMalloc(&d_output, input_size);
+    cudaMalloc(&d_data, input_size);
+    cudaMemcpy(d_data, input.data(), input_size, cudaMemcpyHostToDevice);
 
-    cudaMemcpy(d_input, input.data(), input_size, cudaMemcpyHostToDevice);
-
-    cufftHandle plan_forward;
-    if (cufftPlan1d(&plan_forward, n, CUFFT_C2C, batch) != CUFFT_SUCCESS) {
-        throw std::runtime_error("CUFFT plan creation for forward transform failed.");
+    cufftHandle plan;
+    if (cufftPlan1d(&plan, n, CUFFT_C2C, batch) != CUFFT_SUCCESS) {
+        cudaFree(d_data);
+        throw std::runtime_error("CUFFT plan creation failed.");
     }
 
-    if (cufftExecC2C(plan_forward, d_input, d_output, CUFFT_FORWARD) != CUFFT_SUCCESS) {
+    if (cufftExecC2C(plan, d_data, d_data, CUFFT_FORWARD) != CUFFT_SUCCESS) {
+        cufftDestroy(plan);
+        cudaFree(d_data);
         throw std::runtime_error("CUFFT execution for forward FFT failed.");
     }
 
-    cufftHandle plan_inverse;
-    if (cufftPlan1d(&plan_inverse, n, CUFFT_C2C, batch) != CUFFT_SUCCESS) {
-        throw std::runtime_error("CUFFT plan creation for inverse transform failed.");
-    }
-
-    if (cufftExecC2C(plan_inverse, d_output, d_output, CUFFT_INVERSE) != CUFFT_SUCCESS) {
+    if (cufftExecC2C(plan, d_data, d_data, CUFFT_INVERSE) != CUFFT_SUCCESS) {
+        cufftDestroy(plan);
+        cudaFree(d_data);
         throw std::runtime_error("CUFFT execution for inverse FFT failed.");
     }
 
-    int num_elements = 2 * n * batch;
+    int num_elements = n * batch;
     float norm_factor = 1.0f / static_cast<float>(n);
-    cudaDeviceSynchronize();
+    int threadsPerBlock = 256;
+    int blocksPerGrid = (num_elements + threadsPerBlock - 1) / threadsPerBlock;
 
-    for (int i = 0; i < num_elements; i++) {
-        if (i % 2 == 0) {
-            d_output[i].x *= norm_factor;
-        } else {
-            d_output[i].y *= norm_factor;
-        }
-    }
+    normalize<<<blocksPerGrid, threadsPerBlock>>>(d_data, num_elements, norm_factor);
 
     std::vector<float> result(input.size());
-    cudaMemcpy(result.data(), d_output, input_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(result.data(), d_data, input_size, cudaMemcpyDeviceToHost);
 
-    cufftDestroy(plan_forward);
-    cufftDestroy(plan_inverse);
-    cudaFree(d_input);
-    cudaFree(d_output);
+    cufftDestroy(plan);
+    cudaFree(d_data);
 
     return result;
 }
