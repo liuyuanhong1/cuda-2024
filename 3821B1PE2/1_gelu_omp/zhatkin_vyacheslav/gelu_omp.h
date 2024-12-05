@@ -1,5 +1,5 @@
-#ifndef GELU_OMP_H
-#define GELU_OMP_H
+#ifndef __GELU_OMP_H
+#define __GELU_OMP_H
 
 #include <vector>
 
