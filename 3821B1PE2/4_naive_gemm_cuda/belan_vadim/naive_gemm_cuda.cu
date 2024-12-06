@@ -9,7 +9,7 @@
         cudaError_t err = call;                                           \
         if (err != cudaSuccess) {                                         \
             throw std::runtime_error(std::string("CUDA Error: ") +        \
-                                    cudaGetErrorString(err));             \
+                                     cudaGetErrorString(err));            \
         }                                                                 \
     } while (0)
 
@@ -41,7 +41,7 @@ void TiledGemmKernel(const float* __restrict__ A,
 
         __syncthreads();
 
-#pragma unroll
+    #pragma unroll
         for (int k = 0; k < TILE_SIZE; ++k) {
             sum += As[threadIdx.y][k] * Bs[k][threadIdx.x];
         }
@@ -53,9 +53,7 @@ void TiledGemmKernel(const float* __restrict__ A,
         C[row * n + col] = sum;
 }
 
-std::vector<float> OptimizedGemmCUDA(const std::vector<float>& A,
-                                     const std::vector<float>& B,
-                                     int n) {
+std::vector<float> NaiveGemmCUDA(const std::vector<float>& A, const std::vector<float>& B, int n) {
     if (A.size() != static_cast<size_t>(n * n) ||
         B.size() != static_cast<size_t>(n * n)) {
         throw std::invalid_argument("Input matrices must be of size n x n.");
