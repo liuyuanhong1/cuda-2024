@@ -579,6 +579,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 4_naive_gemm_cuda (4096 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1PE2|belan_vadim|0.1356|
 |3821B1FI1|shipitsin_alex|0.1586|
 |3821B1PE1|yurin_andrey|0.1635|
 |3821B1FI2|kostanyan_arsen|0.1751|
@@ -634,7 +635,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kulagin_aleksandr|0.5823|
 |3821B1PE2|derun_andrei|1.0889|
 |3821B1PE1|kashin_stepan|BUILD FAILED|
-|3821B1PE2|belan_vadim|BUILD FAILED|
 
 ## 5_block_gemm_omp (1024 elements)
 |Group|Name|Result|
@@ -969,7 +969,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 3821B1PE2
 |Group|Name|Passed|
 |-----|----|------|
-|3821B1PE2|belan_vadim|8/9|
+|3821B1PE2|belan_vadim|**9/9**|
 |3821B1PE2|derun_andrei|1/9|
 |3821B1PE2|savchuk_anton|8/9|
 |3821B1PE2|zhatkin_vyacheslav|**9/9**|
