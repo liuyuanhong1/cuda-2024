@@ -1,24 +1,19 @@
 // Copyright (c) 2024 Chuvashov Andrey
 #include "gelu_ocl.h"
 
+#include <iostream>
 #include <CL/opencl.hpp>
-#include <CL/cl_platform.h>
 #include <string>
 #include <utility>
-#include <math.h>
 
 std::vector<float> GeluOCL(const std::vector<float>& input) {
     std::string gelu_kernel = R"(
-__kernel void GeluOCLKernel(__global const float* input, __global float* output, int size) {
-            
+__kernel void geluOCLKernel(__global const float* input, __global float* output, int size) {
     int index = get_global_id(0);
 
-    const float pi_c = sqrt(2.0f / (2 * asin(1.0f)));
-    const float par_c = 0.044715f;
-            
     if (i < size) {
         const float x = input[index];
-        output[index] = 0.5f * x * (1.0f + tanhf(pi_c * (x + par_c * x * x * x)));
+        output[index] = x / (1.0f + exp(-1.59577f * (x + 0.044715f * x * x * x)));
     }
 }
 )";
@@ -44,7 +39,7 @@ __kernel void GeluOCLKernel(__global const float* input, __global float* output,
     cl::Program program(context, sources);
     program.build();
 
-    cl::Kernel kernel(program, "GeluOCLKernel");
+    cl::Kernel kernel(program, "geluOCLKernel");
 
     cl::Buffer bufferInput(
         context,
