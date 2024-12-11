@@ -4,7 +4,9 @@
 
 #define SIZE 32
 
-__global__ void NaiveGemmKernel(const float* a, const float* b, float* c, int n) {
+__global__ void NaiveGemmKernel(const float* a,
+                                const float* b,
+                                float* c, int n) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
     int col = blockIdx.x * blockDim.x + threadIdx.x;
 
@@ -28,9 +30,10 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
     float* d_c = nullptr;
 
     size_t sizeInBytes = n * n * sizeof(float);
-    cudaMalloc((void**)&d_a, sizeInBytes);
-    cudaMalloc((void**)&d_b, sizeInBytes);
-    cudaMalloc((void**)&d_c, sizeInBytes);
+
+    cudaMalloc(&d_a, sizeInBytes);
+    cudaMalloc(&d_b, sizeInBytes);
+    cudaMalloc(&d_c, sizeInBytes);
 
     cudaMemcpy(d_a, a.data(), sizeInBytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), sizeInBytes, cudaMemcpyHostToDevice);
