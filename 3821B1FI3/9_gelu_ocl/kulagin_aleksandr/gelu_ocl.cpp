@@ -5,14 +5,14 @@
 #include <iostream>
 #include <cmath>
 
-static const float precalc_c_1 = std::sqrt(2.0f / M_PIf);
+//static const float precalc_c_1 = std::sqrt(2.0f / M_PIf); // 0.797884561f
 
 static const char* gelu_ocl_source = R"(
-__kernel void gelu_ocl_kernel(__global float* input_output, const int n, const float precalc_c_1) {
+__kernel void gelu_ocl_kernel(__global const float* input, __global float* res, const int n) {
   int i = get_global_id(0);
   if (i < n) {
-    const float x = input_output[i];
-    input_output[i] = 0.5f * x * (1.0f + tanh(precalc_c_1 * ( x + 0.044715f * (x * x * x) )));
+    const float x = input[i];
+    res[i] = 0.5f * x * (1.0f + tanh(0.797884561f * ( x + 0.044715f * (x * x * x) )));
   }
 }
 )";
@@ -68,33 +68,44 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
   unsigned sz = input.size();
   unsigned sz_bytes = sz * sizeof(float);
   std::vector<float> res(sz);
-  cl::Buffer buffer(context, CL_MEM_READ_WRITE, sz_bytes, nullptr, &err);
+  cl::Buffer buffer_input(context, CL_MEM_READ_ONLY, sz_bytes, nullptr, &err);
   if (err) {
-    std::cerr << "Error on create buffer " << err << '\n';
+    std::cerr << "Error on create buffer input " << err << '\n';
     return std::vector<float>();
   }
-  if ((err = queue.enqueueWriteBuffer(buffer, CL_TRUE, 0, sz_bytes, input.data()))) {
+  cl::Buffer buffer_res(context, CL_MEM_WRITE_ONLY, sz_bytes, nullptr, &err);
+  if (err) {
+    std::cerr << "Error on create buffer res " << err << '\n';
+    return std::vector<float>();
+  }
+  if ((err = queue.enqueueWriteBuffer(buffer_input, CL_TRUE, 0, sz_bytes, input.data()))) {
     std::cerr << "Error on write buffer " << err << '\n';
     return std::vector<float>();
   }
   cl::Kernel kernel(program, "gelu_ocl_kernel");
-  if ((err = kernel.setArg(0, buffer))) {
+  if ((err = kernel.setArg(0, buffer_input))) {
     std::cerr << "Error on setting arg 0 " << err << '\n';
     return std::vector<float>();
   }
-  if ((err = kernel.setArg(1, static_cast<int>(sz)))) {
+  if ((err = kernel.setArg(1, buffer_res))) {
     std::cerr << "Error on setting arg 1 " << err << '\n';
     return std::vector<float>();
   }
-  if ((err = kernel.setArg(2, precalc_c_1))) {
+  if ((err = kernel.setArg(2, static_cast<int>(sz)))) {
     std::cerr << "Error on setting arg 2 " << err << '\n';
     return std::vector<float>();
   }
+  /*
+  if ((err = kernel.setArg(3, precalc_c_1))) {
+    std::cerr << "Error on setting arg 3 " << err << '\n';
+    return std::vector<float>();
+  }
+  */
   if ((err = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(sz), cl::NullRange))) {
     std::cerr << "Error on running kernel " << err << '\n';
     return std::vector<float>();
   }
-  if ((err = queue.enqueueReadBuffer(buffer, CL_TRUE, 0, sz_bytes, res.data()))) {
+  if ((err = queue.enqueueReadBuffer(buffer_res, CL_TRUE, 0, sz_bytes, res.data()))) {
     std::cerr << "Error on read buffer " << err << '\n';
     return std::vector<float>();
   }
