@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kostanyan Arsen
+// Copyright (c) 2024  Kazantsev Evgeny
 #ifndef __GELU_OMP_H
 #define __GELU_OMP_H
 
