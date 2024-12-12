@@ -1,28 +1,20 @@
 #include "naive_gemm_omp.h"
 #include <omp.h>
 
-std::vector<float> PerformNaiveGEMM(const std::vector<float>& matrixA,
-                                     const std::vector<float>& matrixB, int dimension) {
-  
-    const int totalElements = dimension * dimension;
+std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
+                                const std::vector<float>& b,
+                                int n) {
+    std::vector<float> c(n * n, 0.0f);
 
-    
-    if (matrixA.size() != totalElements || matrixB.size() != totalElements) {
-        return {};  
-    }
-
-    
-    std::vector<float> resultMatrix(totalElements, 0.0f);
-
-    
     #pragma omp parallel for
-    for (int row = 0; row < dimension; ++row) {
-        for (int col = 0; col < dimension; ++col) {
-            for (int idx = 0; idx < dimension; ++idx) {
-                resultMatrix[row * dimension + col] += matrixA[row * dimension + idx] * matrixB[idx * dimension + col];
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            float tmp = a[i * n + j];
+            for (int k = 0; k < n; ++k) {
+                c[i * n + k] += tmp * b[j * n + k];
             }
         }
     }
 
-    return resultMatrix;
+    return c;
 }

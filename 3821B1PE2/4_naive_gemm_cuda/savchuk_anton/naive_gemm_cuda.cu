@@ -1,7 +1,7 @@
 #include "naive_gemm_cuda.h"
 #include <cuda_runtime.h>
 #include <vector>
-#include <stdexcept>
+#include <iostream>
 
 __global__ void MatrixMultiplyKernel(const float* a, const float* b, float* c, int n) {
     int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -9,38 +9,34 @@ __global__ void MatrixMultiplyKernel(const float* a, const float* b, float* c, i
 
     if (row < n && col < n) {
         float sum = 0.0f;
-        for (int k = 0; k < n; ++k) {
-            sum += a[row * n + k] * b[k * n + col];
+        for (int i = 0; i < n; ++i) {
+            sum += a[row * n + i] * b[i * n + col];
         }
         c[row * n + col] = sum;
     }
 }
 
-std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
-    const std::vector<float>& b,
-    int n) {
-    if (a.size() != n * n || b.size() != n * n) {
-        throw std::invalid_argument("Размер матриц должен быть n*n");
-    }
-
-    std::vector<float> c(n * n, 0.0f);
+std::vector<float> NaiveGemmCUDA(const std::vector<float>& a, const std::vector<float>& b, int n) {
+    size_t size = n * n * sizeof(float);
 
     float* d_a, * d_b, * d_c;
+    cudaMalloc((void**)&d_a, size);
+    cudaMalloc((void**)&d_b, size);
+    cudaMalloc((void**)&d_c, size);
 
-    cudaMalloc(&d_a, n * n * sizeof(float));
-    cudaMalloc(&d_b, n * n * sizeof(float));
-    cudaMalloc(&d_c, n * n * sizeof(float));
+    cudaMemcpy(d_a, a.data(), size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_b, b.data(), size, cudaMemcpyHostToDevice);
 
-    cudaMemcpy(d_a, a.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_b, b.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
+    dim3 blockDim(16, 16);
+    dim3 gridDim((n + blockDim.x - 1) / blockDim.x, (n + blockDim.y - 1) / blockDim.y);
 
-    dim3 threadsPerBlock(16, 16);
-    dim3 blocksPerGrid((n + threadsPerBlock.x - 1) / threadsPerBlock.x,
-        (n + threadsPerBlock.y - 1) / threadsPerBlock.y);
+    MatrixMultiplyKernel << <gridDim, blockDim >> > (d_a, d_b, d_c, n);
 
-    MatrixMultiplyKernel << <blocksPerGrid, threadsPerBlock >> > (d_a, d_b, d_c, n);
+    cudaDeviceSynchronize();
 
-    cudaMemcpy(c.data(), d_c, n * n * sizeof(float), cudaMemcpyDeviceToHost);
+    std::vector<float> c(n * n);
+
+    cudaMemcpy(c.data(), d_c, size, cudaMemcpyDeviceToHost);
 
     cudaFree(d_a);
     cudaFree(d_b);

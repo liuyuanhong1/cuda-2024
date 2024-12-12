@@ -1,0 +1,5 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/4_naive_gemm_cuda/vinichuk_timofey/naive_gemm_cuda.cu(15): error: identifier "printf" is undefined
+               printf("%f\n", sum);
+               ^
+
+1 error detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1PE1/4_naive_gemm_cuda/vinichuk_timofey/naive_gemm_cuda.cu".

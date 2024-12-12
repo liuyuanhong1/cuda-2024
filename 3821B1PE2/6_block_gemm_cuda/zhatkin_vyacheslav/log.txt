@@ -1,4 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1PE2/6_block_gemm_cuda/zhatkin_vyacheslav/block_gemm_cuda.cu:1:10: fatal error: gemm_cublas.h: No such file or directory
-    1 | #include "gemm_cublas.h"
-      |          ^~~~~~~~~~~~~~~
-compilation terminated.

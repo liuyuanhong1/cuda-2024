@@ -1,60 +1,82 @@
-#include "gemm_cublas.h"
-#include <cublas_v2.h>
+#include "block_gemm_cuda.h"
 #include <cuda_runtime.h>
 #include <vector>
-#include <stdexcept>
 #include <iostream>
 
-std::vector<float> GemmCUBLAS(const std::vector<float>& a,
-    const std::vector<float>& b,
-    int n) {
-    // Ensure input matrices are valid
-    if (a.size() != n * n || b.size() != n * n) {
-        throw std::invalid_argument("Matrix size mismatch");
+#define TILE_SIZE 16 // Block size
+
+__global__ void BlockGemmKernel(const float* A, const float* B, float* C, int n) {
+    __shared__ float sharedA[TILE_SIZE][TILE_SIZE];
+    __shared__ float sharedB[TILE_SIZE][TILE_SIZE];
+
+    int row = blockIdx.y * TILE_SIZE + threadIdx.y;
+    int col = blockIdx.x * TILE_SIZE + threadIdx.x;
+
+    float value = 0;
+
+    for (int t = 0; t < (n + TILE_SIZE - 1) / TILE_SIZE; ++t) {
+        // Load tiles into shared memory
+        int A_row = row;
+        int A_col = t * TILE_SIZE + threadIdx.x;
+        if (A_row < n && A_col < n)
+            sharedA[threadIdx.y][threadIdx.x] = A[A_row * n + A_col];
+        else
+            sharedA[threadIdx.y][threadIdx.x] = 0;
+
+        int B_row = t * TILE_SIZE + threadIdx.y;
+        int B_col = col;
+        if (B_row < n && B_col < n)
+            sharedB[threadIdx.y][threadIdx.x] = B[B_row * n + B_col];
+        else
+            sharedB[threadIdx.y][threadIdx.x] = 0;
+
+        __syncthreads();
+
+        // Compute partial results
+        for (int k = 0; k < TILE_SIZE; ++k) {
+            value += sharedA[threadIdx.y][k] * sharedB[k][threadIdx.x];
+        }
+
+        __syncthreads();
     }
 
-    // Allocate memory on GPU for input matrices and result matrix
-    float* d_A;
-    float* d_B;
-    float* d_C;
-    size_t matrix_size = n * n * sizeof(float);
+    // Write the result to global memory
+    if (row < n && col < n) {
+        C[row * n + col] = value;
+    }
+}
 
-    cudaMalloc((void**)&d_A, matrix_size);
-    cudaMalloc((void**)&d_B, matrix_size);
-    cudaMalloc((void**)&d_C, matrix_size);
+std::vector<float> BlockGemmCUDA(const std::vector<float>& a, const std::vector<float>& b, int n) {
+    // Allocate device memory
+    float* d_A, * d_B, * d_C;
+    size_t size = n * n * sizeof(float);
 
-    // Copy matrices from host to device
-    cudaMemcpy(d_A, a.data(), matrix_size, cudaMemcpyHostToDevice);
-    cudaMemcpy(d_B, b.data(), matrix_size, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_A, size);
+    cudaMalloc(&d_B, size);
+    cudaMalloc(&d_C, size);
 
-    // Create cuBLAS handle
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // Copy data from host to device
+    cudaMemcpy(d_A, a.data(), size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_B, b.data(), size, cudaMemcpyHostToDevice);
 
-    // Set up scaling factors
-    const float alpha = 1.0f;
-    const float beta = 0.0f;
+    // Define block and grid dimensions
+    dim3 threadsPerBlock(TILE_SIZE, TILE_SIZE);
+    dim3 numBlocks((n + TILE_SIZE - 1) / TILE_SIZE, (n + TILE_SIZE - 1) / TILE_SIZE);
 
-    // Perform matrix multiplication: C = alpha * A * B + beta * C
-    // Note: cuBLAS assumes column-major order, so we transpose the inputs
-    cublasSgemm(handle,
-        CUBLAS_OP_N, CUBLAS_OP_N,  // No transpose for both matrices
-        n, n, n,                   // Dimensions of the matrices
-        &alpha,                    // Scaling factor for A * B
-        d_A, n,                    // Matrix A and leading dimension
-        d_B, n,                    // Matrix B and leading dimension
-        &beta,                     // Scaling factor for C
-        d_C, n);                   // Matrix C and leading dimension
+    // Launch kernel
+    BlockGemmKernel<<<numBlocks, threadsPerBlock>>>(d_A, d_B, d_C, n);
 
-    // Allocate result vector on host and copy result from device to host
+    // Wait for GPU to finish before accessing on host
+    cudaDeviceSynchronize();
+
+    // Copy result back to host
     std::vector<float> c(n * n);
-    cudaMemcpy(c.data(), d_C, matrix_size, cudaMemcpyDeviceToHost);
+    cudaMemcpy(c.data(), d_C, size, cudaMemcpyDeviceToHost);
 
-    // Free GPU memory and destroy cuBLAS handle
+    // Free device memory
     cudaFree(d_A);
     cudaFree(d_B);
     cudaFree(d_C);
-    cublasDestroy(handle);
 
     return c;
 }
