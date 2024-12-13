@@ -815,6 +815,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |REF|REF|0.0601|
 |3821B1PE1|khramov_ivan|0.0608|
 |3821B1PE1|smirnova_daria|0.0724|
+|3821B1FI2|kostin_artem|0.0757|
 |3821B1PE2|zhatkin_vyacheslav|0.0768|
 |3821B1PE1|moiseev_nikita|0.0786|
 |3821B1FI3|sharapov_georgiy|0.0800|
@@ -828,7 +829,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE2|belan_vadim|0.7925|
 |3821B1PE2|savchuk_anton|0.7926|
 |3821B1FI3|vasliev_ivan|BUILD FAILED|
-|3821B1FI2|kostin_artem|TEST FAILED|
 |3821B1PE2|derun_andrei|TEST FAILED|
 
 ## 8_fft_cufft (131072 elements)
@@ -960,7 +960,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |-----|----|------|
 |3821B1FI2|kazantsev_evgeny|8/9|
 |3821B1FI2|kostanyan_arsen|**9/9**|
-|3821B1FI2|kostin_artem|6/9|
+|3821B1FI2|kostin_artem|7/9|
 |3821B1FI2|petrov_maksim|6/9|
 |3821B1FI2|soloninko_andrey|6/9|
 |3821B1FI2|travin_maksim|**9/9**|
