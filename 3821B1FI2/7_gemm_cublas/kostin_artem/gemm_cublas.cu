@@ -25,26 +25,12 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
     const float alpha = 1.0f;
     const float beta = 0.0f;
 
-    cublasSgeam(handle, 
-                CUBLAS_OP_T, CUBLAS_OP_N, 
-                n, n, 
-                &alpha, d_a, n, 
-                &beta, nullptr, n, 
-                d_a, n);
-
-    cublasSgeam(handle, 
-                CUBLAS_OP_T, CUBLAS_OP_N, 
-                n, n, 
-                &alpha, d_b, n, 
-                &beta, nullptr, n, 
-                d_b, n);
-
     cublasSgemm(handle, 
                 CUBLAS_OP_N, CUBLAS_OP_N, 
                 n, n, n, 
                 &alpha, 
-                d_a, n, 
                 d_b, n, 
+                d_a, n, 
                 &beta, 
                 d_c, n);
 
