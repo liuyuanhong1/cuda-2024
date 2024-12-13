@@ -1,3 +1,5 @@
+// Copyright (c) 2024 Vinichuk Timofey
+
 #include "naive_gemm_cuda.h"
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
@@ -12,7 +14,6 @@ __global__ void NaiveGemmKernel(const float* a, const float* b, float* c, int n)
         float sum = 0.0;
         for (int k = 0; k < n; ++k) {
              sum += a[row * n + k] * b[k * n + col];
-             printf("%f\n", sum);
         }
         c[row * n + col] = sum;
     }
