@@ -1,16 +1,16 @@
 //Copyright 2024 Nedelin Dmitry
 
-include "gelu_omp.h"
+#include "gelu_omp.h"
 #include <cmath>
 
 
-std::vector<float> GeluOMP(const std::vector<float> &input) {
+std::vector<float> GeluOMP(const std::vector<float>& input) {
     if (input.empty()) return {};
 
     float GelRatio_1 = 1.595769122f;
     float GelRatio_2 = 0.071354816f;
 
-    auto Size = input.Size();
+    auto Size = input.size();
     std::vector<float> Out(Size);
 
 #pragma omp parallel for
