@@ -1,5 +1,3 @@
-// Copyright (c) 2024 Yurin Andrey
-
 #include "naive_gemm_omp.h"
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,

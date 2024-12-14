@@ -1,5 +1,3 @@
-// Copyright (c) 2024 Yurin Andrey
-
 #ifndef __NAIVE_GEMM_OMP_H
 #define __NAIVE_GEMM_OMP_H
 
