@@ -7,6 +7,7 @@
 #include <cuda.h>
 
 __global__ void BlockGemmKernel(const float* a, const float* b, float* c, int n) {
+    const int SIZE = 32;
     __shared__ float shared_a[SIZE][SIZE];
     __shared__ float shared_b[SIZE][SIZE];
 
@@ -59,6 +60,7 @@ std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
     cudaMemcpy(kernel_a, a.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(kernel_b, b.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
 
+    const int SIZE = 32;
     dim3 blockSize(SIZE, SIZE);
     dim3 numBlocks((n + SIZE - 1) / SIZE, (n + SIZE - 1) / SIZE);
 
