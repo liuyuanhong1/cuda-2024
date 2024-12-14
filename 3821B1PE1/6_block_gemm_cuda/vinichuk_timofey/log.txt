@@ -1,0 +1,9 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/6_block_gemm_cuda/vinichuk_timofey/block_gemm_cuda.cu(10): error: identifier "SIZE" is undefined
+      __attribute__((shared)) float shared_a[SIZE][SIZE];
+                                             ^
+
+/home/crazyproger/sandbox/cuda-2024/3821B1PE1/6_block_gemm_cuda/vinichuk_timofey/block_gemm_cuda.cu(62): error: identifier "SIZE" is undefined
+      dim3 blockSize(SIZE, SIZE);
+                     ^
+
+2 errors detected in the compilation of "/home/crazyproger/sandbox/cuda-2024/3821B1PE1/6_block_gemm_cuda/vinichuk_timofey/block_gemm_cuda.cu".
