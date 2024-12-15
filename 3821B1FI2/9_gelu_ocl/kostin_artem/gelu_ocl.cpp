@@ -28,7 +28,8 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
         }
     )";
 
-    cl::Program::Sources sources(1, std::make_pair(kernelSource, strlen(kernelSource)));
+    cl::Program::Sources sources;
+    sources.emplace_back(kernelSource, strlen(kernelSource));
     cl::Program program(context, sources);
     program.build({device});
 
