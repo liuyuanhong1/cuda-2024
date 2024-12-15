@@ -41,8 +41,8 @@ __kernel void gelu_kernel(__global const float* input, __global float* output, i
     cl::Buffer buffer_input(context, CL_MEM_READ_ONLY, bytes_size);
     cl::Buffer buffer_output(context, CL_MEM_WRITE_ONLY, bytes_size);
 
-    queue.enqueueWriteBuffer(bufferInput, CL_TRUE,
-                             0, sizeInBytes, input.data());
+    queue.enqueueWriteBuffer(buffer_input, CL_TRUE,
+                             0, bytes_size, input.data());
     kernel.setArg(0, buffer_input);
     kernel.setArg(1, buffer_output);
     kernel.setArg(2, size);
