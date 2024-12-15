@@ -1,12 +1,11 @@
-#include <cmath>
-
 #include "naive_gemm_cuda.h"
 #include "cuda_runtime.h"
-#include "device_launch_parameters.h"
+
 
 __global__ void naiveGemmKernel(const float* a, const float* b, float* c, int n) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    int i = blockIdx.y * blockDim.y + threadIdx.y;
+    int j = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (i < n && j < n) {
         float sum = 0.0f;
@@ -20,10 +19,12 @@ __global__ void naiveGemmKernel(const float* a, const float* b, float* c, int n)
 std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
                                  const std::vector<float>& b,
                                  int n) {
-    
+
     std::vector<float> c(n * n, 0.0f);
 
-    float *d_a, *d_b, *d_c;
+    float* d_a;
+    float* d_b;
+    float* d_c;
 
     cudaMalloc(&d_a, n * n * sizeof(float));
     cudaMalloc(&d_b, n * n * sizeof(float));
@@ -32,11 +33,11 @@ std::vector<float> NaiveGemmCUDA(const std::vector<float>& a,
     cudaMemcpy(d_a, a.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
 
-    dim3 threadsPerBlock(16, 16);
-    dim3 blocksPerGrid((n + threadsPerBlock.x - 1) / threadsPerBlock.x,
-                       (n + threadsPerBlock.y - 1) / threadsPerBlock.y);
+    const size_t blockSize = 32u;
+    dim3 threadsPerBlock(blockSize, blockSize);
+    dim3 gridDimensions((n + blockSize - 1) / blockSize, (n + blockSize - 1) / blockSize);
 
-    naiveGemmKernel<<<blocksPerGrid, threadsPerBlock>>>(d_a, d_b, d_c, n);
+    naiveGemmKernel<<<gridDimensions, threadsPerBlock>>>(d_a, d_b, d_c, n);
 
     cudaMemcpy(c.data(), d_c, n * n * sizeof(float), cudaMemcpyDeviceToHost);
 
