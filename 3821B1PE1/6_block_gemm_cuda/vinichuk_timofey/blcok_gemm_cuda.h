@@ -2,7 +2,6 @@
 #ifndef __BLOCK_GEMM_CUDA_H
 #define __BLOCK_GEMM_CUDA_H
 
-#define SIZE 32
 
 #include <vector>
 
