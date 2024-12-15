@@ -397,6 +397,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 1_gelu_omp (134217728 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1FI2|nogin_denis|0.2464|
 |3821B1PE3|nedelin_dmitry|0.2488|
 |3821B1FI1|balyasov_ivan|0.2573|
 |3821B1FI1|lysanova_julia|0.2671|
@@ -1012,6 +1013,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI2|kazantsev_evgeny|8/9|
 |3821B1FI2|kostanyan_arsen|**9/9**|
 |3821B1FI2|kostin_artem|8/9|
+|3821B1FI2|nogin_denis|1/9|
 |3821B1FI2|petrov_maksim|6/9|
 |3821B1FI2|soloninko_andrey|**9/9**|
 |3821B1FI2|travin_maksim|**9/9**|
