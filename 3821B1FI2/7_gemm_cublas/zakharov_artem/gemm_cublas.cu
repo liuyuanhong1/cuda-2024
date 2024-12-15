@@ -28,8 +28,8 @@ std::vector<float> GemmCUBLAS(const std::vector<float>& a,
 
     cublasHandle_t handle;
     cublasCreate(&handle);
-    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, size, size, size, &alpha,
-                b_dev, size, a_dev, size, &beta, c_dev, size);
+    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_N, n, n, n, &alpha,
+                b_dev, n, a_dev, n, &beta, c_dev, n);
     cublasDestroy(handle);
 
     cudaMemcpy(reinterpret_cast<void*>(c.data()),
