@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Kuznetsov-Artyom
+// Copyright (c) 2024 Nogin Denis
 #ifndef __GELU_OMP_H
 #define __GELU_OMP_H
 
