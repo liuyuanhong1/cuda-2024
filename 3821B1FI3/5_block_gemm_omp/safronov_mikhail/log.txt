@@ -1,0 +1,12 @@
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/5_block_gemm_omp/safronov_mikhail/block_gemm_omp.cpp: In function ‘std::vector<float> BlockGemmOMP(const std::vector<float>&, const std::vector<float>&, int)’:
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/5_block_gemm_omp/safronov_mikhail/block_gemm_omp.cpp:14:21: error: ‘memcpy’ was not declared in this scope
+   14 |                     memcpy(block_a + i * block_sz, a.data() + (ii + i) * n + kk, block_sz * sizeof(float));
+      |                     ^~~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/5_block_gemm_omp/safronov_mikhail/block_gemm_omp.cpp:2:1: note: ‘memcpy’ is defined in header ‘<cstring>’; did you forget to ‘#include <cstring>’?
+    1 | #include "block_gemm_omp.h"
+  +++ |+#include <cstring>
+    2 | 
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/5_block_gemm_omp/safronov_mikhail/block_gemm_omp.cpp:19:25: error: ‘memcpy’ was not declared in this scope
+   19 |                         memcpy(block_b + k * block_sz, b.data() + (kk + k) * n + jj, block_sz * sizeof(float));
+      |                         ^~~~~~
+/home/crazyproger/sandbox/cuda-2024/3821B1FI3/5_block_gemm_omp/safronov_mikhail/block_gemm_omp.cpp:19:25: note: ‘memcpy’ is defined in header ‘<cstring>’; did you forget to ‘#include <cstring>’?
