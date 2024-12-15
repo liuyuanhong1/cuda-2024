@@ -55,5 +55,5 @@ __kernel void geluKernel(__global const float* input, __global float* output, in
     std::vector<float> result(size);
     queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, sizeInBytes, result.data());
 
-    return output;
+    return result;
 }
