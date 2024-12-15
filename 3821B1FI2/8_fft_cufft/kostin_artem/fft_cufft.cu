@@ -1,6 +1,6 @@
 #include <vector>
 #include <cufft.h>
-#include <stdexcept>
+#include <iostream>
 
 __global__ void normalize_kernel(float* data, size_t size, float norm_factor) {
     size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
@@ -10,51 +10,31 @@ __global__ void normalize_kernel(float* data, size_t size, float norm_factor) {
 }
 
 std::vector<float> FffCUFFT(const std::vector<float>& input, int batch) {
+    size_t size = input.size();
+    int elemPerBatch = size / (2 * batch);
 
-    int n = input.size() / (2 * batch);
+    cufftComplex* d_signal = nullptr;
+    size_t complex_size = sizeof(cufftComplex) * elemPerBatch * batch;
+    cudaMalloc(&d_signal, complex_size);
 
-    cufftComplex* d_input;
-    cufftComplex* d_output;
-    size_t size = input.size() * sizeof(float) / 2;
-
-    cudaMalloc(&d_input, size);
-    cudaMalloc(&d_output, size);
-
-    cudaMemcpy(d_input, input.data(), size, cudaMemcpyHostToDevice);
+    cudaMemcpy(d_signal, input.data(), complex_size, cudaMemcpyHostToDevice);
 
     cufftHandle plan;
-    if (cufftPlan1d(&plan, n, CUFFT_C2C, batch) != CUFFT_SUCCESS) {
-        cudaFree(d_input);
-        cudaFree(d_output);
-        throw std::runtime_error("Failed to create cuFFT plan.");
-    }
-
-    if (cufftExecC2C(plan, d_input, d_output, CUFFT_FORWARD) != CUFFT_SUCCESS) {
-        cufftDestroy(plan);
-        cudaFree(d_input);
-        cudaFree(d_output);
-        throw std::runtime_error("Failed to execute forward FFT.");
-    }
-
-    if (cufftExecC2C(plan, d_output, d_input, CUFFT_INVERSE) != CUFFT_SUCCESS) {
-        cufftDestroy(plan);
-        cudaFree(d_input);
-        cudaFree(d_output);
-        throw std::runtime_error("Failed to execute inverse FFT.");
-    }
+    cufftPlan1d(&plan, elemPerBatch, CUFFT_C2C, batch);
+    cufftExecC2C(plan, d_signal, d_signal, CUFFT_FORWARD);
+    cufftExecC2C(plan, d_signal, d_signal, CUFFT_INVERSE);
 
     int threadsPerBlock = 256;
-    int numBlocks = (input.size() + threadsPerBlock - 1) / threadsPerBlock;
-    normalize_kernel<<<numBlocks, threadsPerBlock>>>(reinterpret_cast<float*>(d_input), input.size(), 1.0f / n);
+    int numBlocks = (size + threadsPerBlock - 1) / threadsPerBlock;
+    normalize_kernel<<<numBlocks, threadsPerBlock>>>(reinterpret_cast<float*>(d_signal), size, 1.0f / elemPerBatch);
 
     cudaDeviceSynchronize();
 
-    std::vector<float> output(input.size());
-    cudaMemcpy(output.data(), d_input, size, cudaMemcpyDeviceToHost);
+    std::vector<float> output(size);
+    cudaMemcpy(output.data(), d_signal, complex_size, cudaMemcpyDeviceToHost);
 
     cufftDestroy(plan);
-    cudaFree(d_input);
-    cudaFree(d_output);
+    cudaFree(d_signal);
 
     return output;
 }
