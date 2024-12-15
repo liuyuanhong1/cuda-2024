@@ -1,10 +1,8 @@
-// Copyright (c) 2024 Kashin Stepan
-// Разрешаю копировать и взаимствовать, если указан оригинальный автор: "// Copyright (c) 2024 Kashin Stepan -> Ivanov Ivan"
 #ifndef __GELU_OMP_H
 #define __GELU_OMP_H
 
 #include <vector>
 
-std::vector<float> GeluOMP(const std::vector<float>& input);
+std::vector<float> GeluOMP(const std::vector<float> &input);
 
 #endif // __GELU_OMP_H

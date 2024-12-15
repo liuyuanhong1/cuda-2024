@@ -14,50 +14,54 @@
         }                                                               \
     }
 
-// CUDA kernel для оптимизированного блочного умножения матриц
-__global__ void BlockGemmKernel(const float* a, const float* b, float* c, int n, int block_size) {
+// Определяем размер блока
+#define BLOCK_SIZE 16
+
+// Оптимизированное CUDA ядро для блочного умножения матриц
+__global__ void BlockGemmKernel(const float* __restrict__ a,
+                                const float* __restrict__ b,
+                                float* __restrict__ c,
+                                int n) {
     // Индексы строки и столбца текущего элемента
-    int row = blockIdx.y * block_size + threadIdx.y;
-    int col = blockIdx.x * block_size + threadIdx.x;
+    int row = blockIdx.y * BLOCK_SIZE + threadIdx.y;
+    int col = blockIdx.x * BLOCK_SIZE + threadIdx.x;
 
     // Shared memory для блоков A и B
-    extern __shared__ float shared_mem[];
-    float* As = shared_mem;
-    float* Bs = shared_mem + block_size * block_size;
+    __shared__ float A[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float B[BLOCK_SIZE][BLOCK_SIZE];
 
-    float sum = 0.0f;
+    float cVal = 0.0f;
 
-    // Проходим по всем блокам
-    for (int k = 0; k < n; k += block_size) {
-        // Загружаем блоки A и B в shared memory
-        if (row < n && (k + threadIdx.x) < n) {
-            As[threadIdx.y * block_size + threadIdx.x] = a[row * n + (k + threadIdx.x)];
-        } else {
-            As[threadIdx.y * block_size + threadIdx.x] = 0.0f;
-        }
+    // Проходим по всех блоках по оси K
+    for (int t = 0; t < (n + BLOCK_SIZE - 1) / BLOCK_SIZE; ++t) {
+        // Векторизированная загрузка элементов матрицы A в shared memory
+        if (row < n && (t * BLOCK_SIZE + threadIdx.x) < n)
+            A[threadIdx.y][threadIdx.x] = a[row * n + t * BLOCK_SIZE + threadIdx.x];
+        else
+            A[threadIdx.y][threadIdx.x] = 0.0f;
 
-        if ((k + threadIdx.y) < n && col < n) {
-            Bs[threadIdx.y * block_size + threadIdx.x] = b[(k + threadIdx.y) * n + col];
-        } else {
-            Bs[threadIdx.y * block_size + threadIdx.x] = 0.0f;
-        }
+        // Векторизированная загрузка элементов матрицы B в shared memory
+        if (col < n && (t * BLOCK_SIZE + threadIdx.y) < n)
+            B[threadIdx.y][threadIdx.x] = b[(t * BLOCK_SIZE + threadIdx.y) * n + col];
+        else
+            B[threadIdx.y][threadIdx.x] = 0.0f;
 
-        // Синхронизируем потоки внутри блока
+        // Синхронизация потоков внутри блока
         __syncthreads();
 
-        // Развертывание цикла для увеличения производительности
+        // Разворот цикла для увеличения производительности
         #pragma unroll
-        for (int e = 0; e < block_size; ++e) {
-            sum += As[threadIdx.y * block_size + e] * Bs[e * block_size + threadIdx.x];
+        for (int k = 0; k < BLOCK_SIZE; ++k) {
+            cVal += A[threadIdx.y][k] * B[k][threadIdx.x];
         }
 
-        // Синхронизируем перед загрузкой новых блоков
+        // Синхронизация перед загрузкой новых блоков
         __syncthreads();
     }
 
-    // Записываем результат в глобальную память
+    // Запись результата в глобальную память
     if (row < n && col < n) {
-        c[row * n + col] = sum;
+        c[row * n + col] = cVal;
     }
 }
 
@@ -65,31 +69,36 @@ __global__ void BlockGemmKernel(const float* a, const float* b, float* c, int n,
 std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
                                  const std::vector<float>& b,
                                  int n) {
-    const int block_size = 32; // Оптимальное значение для использования возможностей GPU
-    size_t bytes = n * n * sizeof(float);
+    std::vector<float> c(n * n, 0.0f);
+
+    size_t sizeInBytes = n * n * sizeof(float);
 
     // Выделяем память на устройстве
     float *d_a, *d_b, *d_c;
-    CUDA_ERROR(cudaMalloc(&d_a, bytes));
-    CUDA_ERROR(cudaMalloc(&d_b, bytes));
-    CUDA_ERROR(cudaMalloc(&d_c, bytes));
+    CUDA_ERROR(cudaMalloc(&d_a, sizeInBytes));
+    CUDA_ERROR(cudaMalloc(&d_b, sizeInBytes));
+    CUDA_ERROR(cudaMalloc(&d_c, sizeInBytes));
 
     // Копируем данные на устройство
-    CUDA_ERROR(cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice));
-    CUDA_ERROR(cudaMemcpy(d_b, b.data(), bytes, cudaMemcpyHostToDevice));
+    CUDA_ERROR(cudaMemcpy(d_a, a.data(), sizeInBytes, cudaMemcpyHostToDevice));
+    CUDA_ERROR(cudaMemcpy(d_b, b.data(), sizeInBytes, cudaMemcpyHostToDevice));
 
     // Определяем размеры сетки и блоков
-    dim3 threads(block_size, block_size);
-    dim3 grid((n + block_size - 1) / block_size, (n + block_size - 1) / block_size);
-    size_t shared_mem_size = 2 * block_size * block_size * sizeof(float);
+    dim3 threadsPerBlock(BLOCK_SIZE, BLOCK_SIZE);
+    dim3 numBlocks((n + BLOCK_SIZE - 1) / BLOCK_SIZE,
+                   (n + BLOCK_SIZE - 1) / BLOCK_SIZE);
 
     // Запускаем CUDA ядро
-    BlockGemmKernel<<<grid, threads, shared_mem_size>>>(d_a, d_b, d_c, n, block_size);
+    BlockGemmKernel<<<numBlocks, threadsPerBlock>>>(d_a, d_b, d_c, n);
+
+    // Проверяем наличие ошибок при запуске ядра
+    CUDA_ERROR(cudaGetLastError());
+
+    // Синхронизируем устройство
     CUDA_ERROR(cudaDeviceSynchronize());
 
     // Копируем результат обратно на хост
-    std::vector<float> c(n * n);
-    CUDA_ERROR(cudaMemcpy(c.data(), d_c, bytes, cudaMemcpyDeviceToHost));
+    CUDA_ERROR(cudaMemcpy(c.data(), d_c, sizeInBytes, cudaMemcpyDeviceToHost));
 
     // Освобождаем память на устройстве
     CUDA_ERROR(cudaFree(d_a));
