@@ -1,0 +1,12 @@
+In file included from /home/crazyproger/sandbox/cuda-2024/3821B1FI2/9_gelu_ocl/zakharov_artem/gelu_ocl.cpp:4:
+/usr/include/CL/opencl.hpp:437:112: note: ‘#pragma message: opencl.hpp: CL_HPP_TARGET_OPENCL_VERSION is not defined. It will default to 300 (OpenCL 3.0)’
+  437 | # pragma message("opencl.hpp: CL_HPP_TARGET_OPENCL_VERSION is not defined. It will default to 300 (OpenCL 3.0)")
+      |                                                                                                                ^
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/9_gelu_ocl/zakharov_artem/gelu_ocl.cpp: In function ‘std::vector<float> GeluOCL(const std::vector<float>&)’:
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/9_gelu_ocl/zakharov_artem/gelu_ocl.cpp:44:30: error: ‘bufferInput’ was not declared in this scope; did you mean ‘buffer_input’?
+   44 |     queue.enqueueWriteBuffer(bufferInput, CL_TRUE,
+      |                              ^~~~~~~~~~~
+      |                              buffer_input
+/home/crazyproger/sandbox/cuda-2024/3821B1FI2/9_gelu_ocl/zakharov_artem/gelu_ocl.cpp:45:33: error: ‘sizeInBytes’ was not declared in this scope
+   45 |                              0, sizeInBytes, input.data());
+      |                                 ^~~~~~~~~~~
