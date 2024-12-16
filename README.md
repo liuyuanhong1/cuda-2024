@@ -875,6 +875,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 ## 8_fft_cufft (131072 elements)
 |Group|Name|Result|
 |-----|----|------|
+|3821B1PE1|kirillov_maxim|0.1060|
 |3821B1PE1|vanushkin_dmitry|0.1077|
 |3821B1PE1|tushentsova_karina|0.1138|
 |3821B1FI1|bodrov_daniil|0.1173|
@@ -1058,7 +1059,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|kashin_stepan|8/9|
 |3821B1PE1|khodyrev_fedor|**9/9**|
 |3821B1PE1|khramov_ivan|**9/9**|
-|3821B1PE1|kirillov_maxim|6/9|
+|3821B1PE1|kirillov_maxim|7/9|
 |3821B1PE1|kiselev_igor|**9/9**|
 |3821B1PE1|kriseev_mikhail|**9/9**|
 |3821B1PE1|moiseev_nikita|**9/9**|
