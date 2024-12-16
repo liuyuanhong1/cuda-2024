@@ -1,4 +1,4 @@
-// Copyright (c) 2024 Karagodin-Andrey
+//  Copyright (c) 2024 Karagodin-Andrey
 #include "gelu_omp.h"
 
 #include <cmath>
