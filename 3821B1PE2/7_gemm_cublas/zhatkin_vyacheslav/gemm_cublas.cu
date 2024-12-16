@@ -1,70 +1,57 @@
 #include "gemm_cublas.h"
-#include <cuda_runtime.h>
 #include <cublas_v2.h>
+#include <cuda_runtime.h>
 #include <iostream>
+#include <stdexcept>
 
-// Функция для транспонирования матрицы
-__global__ void transpose(float* out, const float* in, int n) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    int idy = blockIdx.y * blockDim.y + threadIdx.y;
-
-    if (idx < n && idy < n) {
-        out[idy * n + idx] = in[idx * n + idy];
+// Function to multiply two matrices using cuBLAS
+std::vector<float> GemmCUBLAS(const std::vector<float>& a, const std::vector<float>& b, int n) {
+    if (a.size() != n * n || b.size() != n * n) {
+        throw std::invalid_argument("Matrix dimensions do not match the expected size.");
     }
-}
 
-std::vector<float> GemmCUBLAS(const std::vector<float>& a,
-                              const std::vector<float>& b,
-                              int n) {
-    // Инициализация cuBLAS
-    cublasHandle_t handle;
-    cublasCreate(&handle);
+    // Result matrix
+    std::vector<float> c(n * n, 0);
 
-    // Выделяем память на устройстве
-    float *d_a, *d_b, *d_c, *d_a_transposed, *d_b_transposed;
-    cudaMalloc((void**)&d_a, n * n * sizeof(float));  // Матрица A (n x n)
-    cudaMalloc((void**)&d_b, n * n * sizeof(float));  // Матрица B (n x n)
-    cudaMalloc((void**)&d_c, n * n * sizeof(float));  // Матрица C (n x n)
-    cudaMalloc((void**)&d_a_transposed, n * n * sizeof(float)); // Транспонированная A
-    cudaMalloc((void**)&d_b_transposed, n * n * sizeof(float)); // Транспонированная B
+    // Pointers for device memory
+    float *d_a, *d_b, *d_c;
 
-    // Копируем данные с хоста на устройство
+    // Allocate device memory
+    cudaMalloc((void**)&d_a, n * n * sizeof(float));
+    cudaMalloc((void**)&d_b, n * n * sizeof(float));
+    cudaMalloc((void**)&d_c, n * n * sizeof(float));
+
+    // Copy data to device
     cudaMemcpy(d_a, a.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_b, b.data(), n * n * sizeof(float), cudaMemcpyHostToDevice);
 
-    // Транспонируем матрицы A и B на устройстве
-    dim3 blockSize(16, 16);
-    dim3 gridSize((n + blockSize.x - 1) / blockSize.x, (n + blockSize.y - 1) / blockSize.y);
-    transpose<<<gridSize, blockSize>>>(d_a_transposed, d_a, n);
-    transpose<<<gridSize, blockSize>>>(d_b_transposed, d_b, n);
-    cudaDeviceSynchronize();
+    // Create cuBLAS handle
+    cublasHandle_t handle;
+    cublasCreate(&handle);
 
-    // Выполняем умножение матриц: C = A * B
+    // cuBLAS constants for matrix multiplication
     const float alpha = 1.0f;
     const float beta = 0.0f;
 
-    // Теперь данные в d_a_transposed и d_b_transposed находятся в правильном формате для cuBLAS
+    // Perform matrix multiplication: C = alpha * A * B + beta * C
+    // Note: cuBLAS expects column-major storage
     cublasSgemm(handle,
                 CUBLAS_OP_N, CUBLAS_OP_N,
                 n, n, n,
                 &alpha,
-                d_a_transposed, n,  // A транспонирована, это n x n в столбцовом порядке
-                d_b_transposed, n,  // B транспонирована, это n x n в столбцовом порядке
+                d_b, n,  // Matrix B
+                d_a, n,  // Matrix A
                 &beta,
-                d_c, n);  // C будет n x n
+                d_c, n); // Matrix C
 
-    // Копируем результат с устройства на хост
-    std::vector<float> c(n * n);
+    // Copy result back to host
     cudaMemcpy(c.data(), d_c, n * n * sizeof(float), cudaMemcpyDeviceToHost);
 
-    // Освобождаем память
+    // Clean up
     cudaFree(d_a);
     cudaFree(d_b);
     cudaFree(d_c);
-    cudaFree(d_a_transposed);
-    cudaFree(d_b_transposed);
     cublasDestroy(handle);
 
-    // Возвращаем результат (в формате row-major)
     return c;
 }
