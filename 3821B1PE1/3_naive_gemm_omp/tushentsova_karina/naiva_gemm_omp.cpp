@@ -3,8 +3,8 @@
 #include <omp.h>
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
-                                const std::vector<float>& b,
-                                int n) {
+    const std::vector<float>& b,
+    int n) {
     long total_elements = n * n;
     if (a.size() != total_elements || b.size() != total_elements) {
         return {};

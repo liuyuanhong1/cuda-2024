@@ -1,23 +1,21 @@
-#include "gelu_omp.hpp"
+#include "gelu_omp.h"
 #include <cmath>
 
-#define GELU_COEF1 1.595769122f
-#define GELU_COEF2 0.071354816f
 
-std::vector<float> GeluOMP(const std::vector<float>& input) {
-    std::vector<float> output(input.size());
+std::vector<float> GeluOMP(const std::vector<float> &input) {
+  if (input.empty()) return {};
 
-    const int size = input.size();
+  constexpr float geluCoeff1 = 1.595769122f;
+  constexpr float geluCoeff2 = 0.071354816f;    
 
-    const float* input_data = input.data();
-    float* output_data = output.data();
+  auto size = input.size();
+  std::vector<float> output(size);
 
-    #pragma omp parallel for
-    for (int i = 0; i < size; i++) {
-        float x = input_data[i];
-        
-        output_data[i] = x * (1.0f - 1.0f / (1.0f + std::exp(x * (GELU_COEF1 + x * x * GELU_COEF2)))); 
-    }
+#pragma omp parallel for
+  for (size_t i = 0; i < size; ++i) {
+    float value = input[i];
+    output[i] = value * (1 - 1 / (1.0f + std::exp(value * (geluCoeff1 + value * value * geluCoeff2))));
+  }
 
-    return output;
+  return output;
 }

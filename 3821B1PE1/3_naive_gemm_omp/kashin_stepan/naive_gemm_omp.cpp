@@ -1,8 +1,4 @@
-// Copyright (c) 2024 KashinStepan
-
 #include "naive_gemm_omp.h"
-#include <chrono>
-#include <thread>
 
 std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
                                    const std::vector<float>& b, 
@@ -24,8 +20,6 @@ std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
             }
           }
         }
-        // Добавляем фиксированную задержку после обработки каждого блока
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
       }
     }
   }
