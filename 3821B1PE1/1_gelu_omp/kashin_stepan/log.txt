@@ -1,7 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kashin_stepan/gelu_omp.cpp: In function ‘std::vector<float> GeluOMP(const std::vector<float>&)’:
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kashin_stepan/gelu_omp.cpp:20:17: error: expected ‘}’ at end of input
-   20 |   return output;
-      |                 ^
-/home/crazyproger/sandbox/cuda-2024/3821B1PE1/1_gelu_omp/kashin_stepan/gelu_omp.cpp:5:61: note: to match this ‘{’
-    5 | std::vector<float> GeluOMP(const std::vector<float> &input) {
-      |                                                             ^
