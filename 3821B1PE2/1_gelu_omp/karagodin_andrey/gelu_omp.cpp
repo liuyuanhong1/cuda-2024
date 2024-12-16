@@ -4,7 +4,8 @@
 #include <cmath>
 
 std::vector<float> GeluOMP(const std::vector<float> &input) {
-  if (input.empty()) return {};
+  if (input.empty())
+    return {};
 
   /**
    * PI = 3.14159
