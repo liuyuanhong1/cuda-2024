@@ -18,3 +18,4 @@ std::vector<float> GeluOMP(const std::vector<float> &input) {
   }
 
   return output;
+}
