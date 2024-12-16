@@ -1,10 +1,11 @@
 //  Copyright (c) 2024 Karagodin-Andrey
 #include "naive_gemm_omp.h"
 
-std::vector<float> NaiveGemmOMP(const std::vector<float>& a,
-                                const std::vector<float>& b, int size) {
+std::vector<float> NaiveGemmOMP(const std::vector<float> &a,
+                                const std::vector<float> &b, int size) {
   auto countElem = size * size;
-  if (a.size() != countElem || b.size() != countElem) return {};
+  if (a.size() != countElem || b.size() != countElem)
+    return {};
 
   std::vector<float> c(countElem, 0.0f);
 
