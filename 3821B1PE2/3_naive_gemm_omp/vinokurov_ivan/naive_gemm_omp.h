@@ -1,3 +1,4 @@
+//  Copyright (c) 2024 Vinokurov Ivan
 #ifndef __NAIVE_GEMM_OMP_H
 #define __NAIVE_GEMM_OMP_H
 
