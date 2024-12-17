@@ -6,4 +6,4 @@
 
 std::vector<float> FffCUFFT(const std::vector<float>& input, int batch);
 
-#endif // __FFT_CUFFT_H
+#endif  // __FFT_CUFFT_H
