@@ -9,8 +9,9 @@
 
 #define BLOCK_SIZE 32
 
-__global__ void myKernel(const float* a, const float* b,
-                         float* const c, const int size) {
+__global__ void myKernel(const float *a, const float *b,
+                         float *const c, const int size)
+{
     __shared__ float aCached[BLOCK_SIZE][BLOCK_SIZE];
     __shared__ float bCached[BLOCK_SIZE][BLOCK_SIZE];
 
@@ -22,33 +23,37 @@ __global__ void myKernel(const float* a, const float* b,
 
     float cVal = 0.0f;
 
-    for (int t = 0; t < size / BLOCK_SIZE; ++t) {
+    for (int t = 0; t < size / BLOCK_SIZE; ++t)
+    {
         aCached[ty][tx] = a[nIdx * size + t * BLOCK_SIZE + tx];
         bCached[ty][tx] = b[(t * BLOCK_SIZE + ty) * size + mIdx];
 
         __syncthreads();
-        for (int k = 0; k < BLOCK_SIZE; ++k) {
+        for (int k = 0; k < BLOCK_SIZE; ++k)
+        {
             cVal += aCached[ty][k] * bCached[k][tx];
         }
         __syncthreads();
     }
 
-    if (nIdx < size && mIdx < size) {
+    if (nIdx < size && mIdx < size)
+    {
         c[nIdx * size + mIdx] = cVal;
     }
 }
 
-std::vector<float> BlockGemmCUDA(const std::vector<float>& a,
-                                 const std::vector<float>& b, int size) {
+std::vector<float> BlockGemmCUDA(const std::vector<float> &a,
+                                 const std::vector<float> &b, int size)
+{
     std::vector<float> c(size * size);
 
     size_t sizeInBytes = size * size * sizeof(*a.data());
 
-    float* d_a;
+    float *d_a;
     cudaMalloc(&d_a, sizeInBytes);
-    float* d_b;
+    float *d_b;
     cudaMalloc(&d_b, sizeInBytes);
-    float* d_c;
+    float *d_c;
     cudaMalloc(&d_c, sizeInBytes);
 
     cudaMemcpy(d_a, a.data(), sizeInBytes, cudaMemcpyHostToDevice);
