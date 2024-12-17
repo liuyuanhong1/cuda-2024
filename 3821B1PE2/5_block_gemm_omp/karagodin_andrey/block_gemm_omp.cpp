@@ -4,7 +4,8 @@
 std::vector<float> BlockGemmOMP(const std::vector<float> &a,
                                 const std::vector<float> &b, int size) {
   auto countElem = size * size;
-  if (a.size() != countElem || b.size() != countElem) return {};
+  if (a.size() != countElem || b.size() != countElem)
+    return {};
 
   std::vector<float> c(countElem, 0.0f);
   constexpr auto blockSize = 8;
