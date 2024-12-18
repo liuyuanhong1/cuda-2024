@@ -4,10 +4,10 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-__global__ void BlockGemmKernel(const float* a,
+__global__ void BlockGemmKernel (const float* a,
                                 const float* b,
                                 float* c,
-                                int n){
+                                int n) {
 
     __shared__ float shared_a[SIZE][SIZE];
     __shared__ float shared_b[SIZE][SIZE];
@@ -28,15 +28,15 @@ __global__ void BlockGemmKernel(const float* a,
                 shared_b[threadIdx.y][threadIdx.x] =
                 b[(i + threadIdx.y) * n + column];
             }
+
+            __syncthreads();
+
+            for (int j = 0; j < SIZE; ++j){
+                current += shared_a[threadIdx.y][j] * shared_b[j][threadIdx.x];
+            }
+
+            __syncthreads();
         }
-
-        __syncthreads();
-
-        for (int j = 0; j < SIZE; ++j){
-            current += shared_a[threadIdx.y][j] * shared_b[j][threadIdx.x];
-        }
-
-        __syncthreads();
     }
 
     c[row * n + column] = current;

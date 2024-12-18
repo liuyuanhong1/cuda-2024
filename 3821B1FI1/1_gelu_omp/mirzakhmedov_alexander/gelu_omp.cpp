@@ -7,13 +7,19 @@
 #endif
 
 std::vector<float> GeluOMP(const std::vector<float>& input) {
-    std::vector<float> result(input.size());
+    size_t m = input.size();
+    std::vector<float> out(m);
+
+    const float sqrt = std::sqrt(2.0 / M_PI);
 
 #pragma omp parallel for
-    for (size_t i = 0; i < input.size(); ++i) {
+    for (size_t i = 0; i < m; ++i) {
         float x = input[i];
-        result[i] = 0.5f * x * (1.0f + std::tanh((2.0f / M_PI) * (x + 0.044715f * std::pow(x, 3))));
+        float x_c = x * x * x;
+        float arg_tan = sqrt * (x + 0.044715 * x_c);
+        float value = 0.5f * x * (1.0f + std::tanh(arg_tan));
+        out[i] = value;
     }
 
-    return result;
+    return out;
 }
