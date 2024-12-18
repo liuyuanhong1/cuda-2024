@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Vinichuk Timofey
 #ifndef __FFT_CUFFT_H
 #define __FFT_CUFFT_H
 

@@ -1,3 +1,4 @@
+// Copyright (c) 2024 Vinichuk Timofey
 #include "fft_cufft.h"
 
 __global__ void normalizeKernel(float* input, int size, int n) {
