@@ -1,11 +1,10 @@
-//Copyright Kutarin Aleksandr 2024
+// Copyright Kutarin Aleksandr 2024
 
-#ifndef GELU_CUDA_H
-#define GELU_CUDA_H
+#ifndef __GELU_CUDA_H
+#define __GELU_CUDA_H
 
 #include <vector>
 
-// Function prototype for GELU CUDA implementation
 std::vector<float> GeluCUDA(const std::vector<float>& input);
 
-#endif // __GELU_CUDA_H
+#endif  // __GELU_CUDA_H
