@@ -5,6 +5,17 @@
 #include <vector>
 #include <mutex>
 
+#define CHECK_CL_ERROR(callable)                                          \
+  {                                                                       \
+    auto codeError = callable;                                            \
+    if (codeError != CL_SUCCESS) {                                        \
+      std::cerr << "\033[1;31merror\033[0m: ";                            \
+      std::cerr << "code error: " << static_cast<int>(codeError) << '\n'; \
+      std::cerr << "loc: " << __FILE__ << '(' << __LINE__ << ")\n";       \
+      std::exit(static_cast<int>(codeError));                             \
+    }                                                                     \
+  }
+
 namespace {
     cl::Context context;
     cl::CommandQueue queue;
@@ -16,17 +27,14 @@ namespace {
     std::once_flag initFlag;
 
     void initializeOpenCL(size_t bufferBytes) {
-        // Get all platforms (drivers)
         std::vector<cl::Platform> platforms;
         cl::Platform::get(&platforms);
         if (platforms.empty()) {
             throw std::runtime_error("No OpenCL platforms found.");
         }
 
-        // Use platform 0
-        cl::Platform platform = platforms[0];
+        cl::Platform platform = platforms.front();
 
-        // Get GPU devices
         std::vector<cl::Device> devices;
         platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
         if (devices.empty()) {
@@ -35,34 +43,31 @@ namespace {
 
         device = devices.front();
 
-        // Create context and command queue
         context = cl::Context(device);
         queue = cl::CommandQueue(context, device);
 
-        // OpenCL kernel code
         const std::string kernelSource = R"CLC(
-        __kernel void gelu_activation(__global const float* input, __global float* output, const int size) {
-            int gid = get_global_id(0);
-            if (gid >= size) return;
-            float x = input[gid];
-            // GELU computation
-            float y = 0.5f * x * (1.0f + tanh(0.79788456f * (x + 0.044715f * x * x * x)));
-            output[gid] = y;
+        __kernel void gelu_kernel(__global const float* x, __global float* y, int countElem) {
+            int i = get_global_id(0);
+
+            if (i < countElem) {
+                float val = x[i];
+                float tmp = val * (1.595769122f + val * val * 0.071354816f);
+                y[i] = val - val / (1.0f + exp(tmp));
+            }
         }
         )CLC";
 
-        // Build program
         cl::Program::Sources sources;
         sources.emplace_back(std::move(kernelSource));
         program = cl::Program(context, sources);
         if (program.build() != CL_SUCCESS) {
             std::cerr << "Build log:\n" << program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(device) << std::endl;
+            throw std::runtime_error("Failed to build OpenCL program.");
         }
 
-        // Create kernel
-        kernel = cl::Kernel(program, "gelu_activation");
+        kernel = cl::Kernel(program, "gelu_kernel");
 
-        // Create buffers
         bufferInput = cl::Buffer(context, CL_MEM_READ_ONLY, bufferBytes);
         bufferOutput = cl::Buffer(context, CL_MEM_WRITE_ONLY, bufferBytes);
     }
@@ -76,7 +81,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
     size_t dataSize = input.size();
     size_t bufferBytes = dataSize * sizeof(float);
 
-    // Initialize OpenCL once
     try {
         std::call_once(initFlag, initializeOpenCL, bufferBytes);
     } catch (const std::exception& e) {
@@ -84,32 +88,27 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
         return {};
     }
 
-    // If buffers are smaller than needed, re-create them
-    if (bufferInput.getInfo<CL_MEM_SIZE>() < bufferBytes) {
+    if (bufferInput.getInfo<CL_MEM_SIZE>() != bufferBytes) {
         bufferInput = cl::Buffer(context, CL_MEM_READ_ONLY, bufferBytes);
         bufferOutput = cl::Buffer(context, CL_MEM_WRITE_ONLY, bufferBytes);
     }
 
-    // Copy data to input buffer
-    queue.enqueueWriteBuffer(bufferInput, CL_FALSE, 0, bufferBytes, input.data());
+    CHECK_CL_ERROR(queue.enqueueWriteBuffer(bufferInput, CL_TRUE, 0, bufferBytes, input.data()));
 
-    // Set kernel arguments
     kernel.setArg(0, bufferInput);
     kernel.setArg(1, bufferOutput);
     kernel.setArg(2, static_cast<int>(dataSize));
 
-    // Determine global and local work sizes
     size_t localRangeSize = 256;
+    size_t maxLocalSize = device.getInfo<CL_DEVICE_MAX_WORK_GROUP_SIZE>();
+    localRangeSize = std::min(localRangeSize, maxLocalSize);
     size_t globalRangeSize = ((dataSize + localRangeSize - 1) / localRangeSize) * localRangeSize;
-    cl::NDRange globalRange(globalRangeSize);
-    cl::NDRange localRange(localRangeSize);
 
-    // Execute kernel
-    queue.enqueueNDRangeKernel(kernel, cl::NullRange, globalRange, localRange);
+    CHECK_CL_ERROR(queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(globalRangeSize), cl::NDRange(localRangeSize)));
+    queue.finish();
 
-    // Read results
     std::vector<float> output(dataSize);
-    queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, bufferBytes, output.data());
+    CHECK_CL_ERROR(queue.enqueueReadBuffer(bufferOutput, CL_TRUE, 0, bufferBytes, output.data()));
 
     return output;
 }
