@@ -4,49 +4,50 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
-#include <math.h>
+#include <cmath>
 
-global void GeluKernel(const float* input, float* output, size_t size) {
-  size_t index = blockIdx.x * blockDim.x + threadIdx.x;
+__global__ void GeluKernel(const float* input, float* output, size_t size) {
+    size_t index = blockIdx.x * blockDim.x + threadIdx.x;
 
-  if (index >= size) {
-    return;
-  }
+    if (index >= size) {
+        return;
+    }
 
-  const float factor = std::sqrt(2.0f / M_PI);
-  constexpr float cubicCoeff = 0.044715f;
+    const float factor = sqrtf(2.0f / M_PI);
+    const float cubicCoeff = 0.044715f;
 
-  float curr = input[index];
-  output[index] = 0.5f * curr * (1.0f + std::tanh(factor * (curr + cubicCoeff * curr * curr * curr)));
+    float curr = input[index];
+    output[index] = 0.5f * curr * (1.0f + tanhf(factor * (curr + cubicCoeff * curr * curr * curr)));
 }
 
 std::vector<float> GeluCUDA(const std::vector<float>& input) {
-  size_t size = input.size();
+    size_t size = input.size();
 
-  if (size == 0) {
-    return {};
-  }
+    if (size == 0) {
+        return {};
+    }
 
-  std::vector<float> output(size);
-  float* deviceInputArray = nullptr;
-  float* deviceOutputArray = nullptr;
-  size_t bufferSize = size * sizeof(float);
+    std::vector<float> output(size);
+    float* deviceInputArray = nullptr;
+    float* deviceOutputArray = nullptr;
+    size_t bufferSize = size * sizeof(float);
 
-  cudaMalloc(&deviceInputArray, bufferSize);
-  cudaMalloc(&deviceOutputArray, bufferSize);
+    cudaMalloc(&deviceInputArray, bufferSize);
+    cudaMalloc(&deviceOutputArray, bufferSize);
 
-  cudaMemcpy(deviceInputArray, input.data(), bufferSize, cudaMemcpyHostToDevice);
+    cudaMemcpy(deviceInputArray, input.data(), bufferSize, cudaMemcpyHostToDevice);
 
-  cudaDeviceProp deviceProperties;
-  cudaGetDeviceProperties(&deviceProperties, 0);
-  size_t threadsPerBlock = deviceProperties.maxThreadsPerBlock;
-  size_t blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
+    cudaDeviceProp deviceProperties;
+    cudaGetDeviceProperties(&deviceProperties, 0);
+    size_t threadsPerBlock = deviceProperties.maxThreadsPerBlock;
+    size_t blocksPerGrid = (size + threadsPerBlock - 1) / threadsPerBlock;
 
-  GeluKernel<<<blocksPerGrid, threadsPerBlock>>>(deviceInputArray, deviceOutputArray, size);
-  cudaMemcpy(output.data(), deviceOutputArray, bufferSize, cudaMemcpyDeviceToHost);
+    GeluKernel<<<blocksPerGrid, threadsPerBlock>>>(deviceInputArray, deviceOutputArray, size);
 
-  cudaFree(deviceInputArray);
-  cudaFree(deviceOutputArray);
+    cudaMemcpy(output.data(), deviceOutputArray, bufferSize, cudaMemcpyDeviceToHost);
 
-  return output;
+    cudaFree(deviceInputArray);
+    cudaFree(deviceOutputArray);
+
+    return output;
 }
