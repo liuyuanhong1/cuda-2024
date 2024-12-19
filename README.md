@@ -687,6 +687,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|korablev_nikita|0.2824|
 |3821B1PE2|kochetov_nikolay|0.2874|
 |3821B1PE3|smirnov_pavel|0.3040|
+|3821B1PE2|novostroev_ivan|0.3083|
 |3821B1PE1|vinichuk_timofey|0.3297|
 |3821B1PE2|savchuk_anton|0.3301|
 |3821B1PE2|kutarin_aleksandr|0.3454|
@@ -1220,7 +1221,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE2|kochetov_nikolay|**9/9**|
 |3821B1PE2|kutarin_aleksandr|**9/9**|
 |3821B1PE2|nikitin_kirill|**9/9**|
-|3821B1PE2|novostroev_ivan|3/9|
+|3821B1PE2|novostroev_ivan|4/9|
 |3821B1PE2|platonova_maria|**9/9**|
 |3821B1PE2|savchuk_anton|8/9|
 |3821B1PE2|vinokurov_ivan|**9/9**|
