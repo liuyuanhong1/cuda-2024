@@ -17,14 +17,22 @@ std::vector<float> GemmCUBLAS(const std::vector<float> &a,
     cudaMemcpy(d_b, b.data(), size, cudaMemcpyHostToDevice);
     cublasHandle_t handle;
     cublasCreate(&handle);
+    cublasSetMathMode(handle, CUBLAS_TF32_TENSOR_OP_MATH);
     float *d_b_t;
     cudaMalloc(&d_b_t, size);
 
     float alpha = 1.0f;
     float beta = 0.0f;
 
-    cublasSgeam(handle, CUBLAS_OP_T, CUBLAS_OP_N, n, n, &alpha, d_b, n, &beta, d_b, n, d_b_t, n);
-    cublasSgemm(handle, CUBLAS_OP_N, CUBLAS_OP_T, n, n, n, &alpha, d_a, n, d_b_t, n, &beta, d_c, n);
+    cublasGemmEx(handle,
+                 CUBLAS_OP_N, CUBLAS_OP_N,
+                 n, n, n,
+                 &alpha,
+                 d_b, CUDA_R_32F, n,
+                 d_a, CUDA_R_32F, n,
+                 &beta,
+                 d_c, CUDA_R_32F, n,
+                 CUBLAS_COMPUTE_32F_FAST_16F, CUBLAS_GEMM_DEFAULT);
 
     std::vector<float> c(n * n);
     cudaMemcpy(c.data(), d_c, size, cudaMemcpyDeviceToHost);
