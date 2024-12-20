@@ -5,7 +5,8 @@
 #include <string>
 #include <utility>
 
-std::vector<float> GeluOCL(const std::vector<float>& input) {
+std::vector<float> GeluOCL(const std::vector<float>& input) 
+{
     std::vector<cl::Platform> platforms;
     cl::Platform::get(&platforms);
 
