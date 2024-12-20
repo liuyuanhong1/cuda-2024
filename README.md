@@ -797,6 +797,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|morgachev_stepan|0.3136|
 |3821B1PE1|tushentsova_karina|0.3137|
 |3821B1FI2|petrov_maksim|0.3179|
+|3821B1FI3|safronov_mikhail|0.3192|
 |3821B1FI3|kulagin_aleksandr|0.3274|
 |3821B1FI2|zakharov_artem|0.3504|
 |3821B1PE1|kashin_stepan|0.3548|
@@ -820,7 +821,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|kulaev_zhenya|0.5147|
 |3821B1FI3|durandin_vladimir|0.5392|
 |3821B1FI3|simonyan_suren|0.5419|
-|3821B1FI3|safronov_mikhail|BUILD FAILED|
 
 ## 6_block_gemm_cuda (4096 elements)
 |Group|Name|Result|
@@ -1208,7 +1208,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|ryabkov_vladislav|**9/9**|
 |3821B1FI3|sadikov_damir|**9/9**|
 |3821B1FI3|safarov_nurlan|**9/9**|
-|3821B1FI3|safronov_mikhail|8/9|
+|3821B1FI3|safronov_mikhail|**9/9**|
 |3821B1FI3|sharapov_georgiy|**9/9**|
 |3821B1FI3|simonyan_suren|**9/9**|
 |3821B1FI3|tyulkina_olga|**9/9**|
