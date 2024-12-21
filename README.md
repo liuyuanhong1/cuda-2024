@@ -496,8 +496,8 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE2|savchuk_anton|0.2378|
 |3821B1FI3|kulikov_artem|0.2385|
 |3821B1PE1|kudinov_nikita|0.2386|
-|3821B1FI1|bodrov_daniil|0.2399|
 |3821B1FI3|ulyanov_daniil|0.2399|
+|3821B1FI1|bodrov_daniil|0.2399|
 |3821B1FI3|prokofev_kirill|0.2402|
 |3821B1PE1|kirillov_maxim|0.2404|
 |3821B1PE1|vinichuk_timofey|0.2407|
@@ -600,6 +600,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI1|mirzakhmedov_alexander|0.1316|
 |3821B1FI3|sharapov_georgiy|0.1553|
 |3821B1PE1|podyachikh_mikhail|0.1577|
+|3821B1FI3|ulyanov_daniil|0.1632|
 |3821B1FI2|travin_maksim|0.1666|
 |3821B1FI2|soloninko_andrey|0.1670|
 |3821B1FI2|kazantsev_evgeny|0.1676|
@@ -1258,7 +1259,7 @@ Passed: 9
 |3821B1FI3|sharapov_georgiy|**9/9**|
 |3821B1FI3|simonyan_suren|**9/9**|
 |3821B1FI3|tyulkina_olga|**9/9**|
-|3821B1FI3|ulyanov_daniil|2/9|
+|3821B1FI3|ulyanov_daniil|3/9|
 |3821B1FI3|vasilev_ivan|**9/9**|
 |3821B1FI3|vasliev_ivan|0/9|
 |3821B1FI3|volodin_evgeniy|**9/9**|
