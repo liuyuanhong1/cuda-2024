@@ -408,6 +408,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|lebedeva_ksenia|0.2723|
 |3821B1FI3|vasilev_ivan|0.2725|
 |3821B1FI3|polozov_vladislav|0.2766|
+|3821B1PE2|dostavalov_semyon|0.2790|
 |3821B1PE1|afanasyev_aleksey|0.2791|
 |3821B1FI3|kulikov_artem|0.2794|
 |3821B1PE1|kudinov_nikita|0.2818|
@@ -571,6 +572,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|vanushkin_dmitry|0.3671|
 |3821B1PE2|zhatkin_vyacheslav|0.4486|
 |3821B1PE2|derun_andrei|TEST FAILED|
+|3821B1PE2|dostavalov_semyon|BUILD FAILED|
 
 ## 3_naive_gemm_omp (1024 elements)
 |Group|Name|Result|
@@ -1207,6 +1209,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI1|shipitsin_alex|**9/9**|
 |3821B1FI1|shmelev_ivan|**9/9**|
 |3821B1FI1|veselov_ilya|**9/9**|
+
 Passed: 13
 
 ## 3821B1FI2
@@ -1221,6 +1224,7 @@ Passed: 13
 |3821B1FI2|travin_maksim|**9/9**|
 |3821B1FI2|zakharov_artem|**9/9**|
 |3821B1FI2|zawadowski_jan|**9/9**|
+
 Passed: 9
 
 ## 3821B1FI3
@@ -1248,6 +1252,7 @@ Passed: 9
 |3821B1FI3|vasilev_ivan|**9/9**|
 |3821B1FI3|vasliev_ivan|0/9|
 |3821B1FI3|volodin_evgeniy|**9/9**|
+
 Passed: 20
 
 ## 3821B1PE1
@@ -1275,6 +1280,7 @@ Passed: 20
 |3821B1PE1|vanushkin_dmitry|**9/9**|
 |3821B1PE1|vinichuk_timofey|**9/9**|
 |3821B1PE1|yurin_andrey|**9/9**|
+
 Passed: 21
 
 ## 3821B1PE2
@@ -1283,6 +1289,7 @@ Passed: 21
 |3821B1PE2|bakhtiarov_alexander|**9/9**|
 |3821B1PE2|belan_vadim|**9/9**|
 |3821B1PE2|derun_andrei|1/9|
+|3821B1PE2|dostavalov_semyon|1/9|
 |3821B1PE2|filatov_maxim|**9/9**|
 |3821B1PE2|gontsov_roman|**9/9**|
 |3821B1PE2|karagodin_andrey|**9/9**|
@@ -1295,6 +1302,7 @@ Passed: 21
 |3821B1PE2|savchuk_anton|**9/9**|
 |3821B1PE2|vinokurov_ivan|**9/9**|
 |3821B1PE2|zhatkin_vyacheslav|**9/9**|
+
 Passed: 14
 
 ## 3821B1PE3
@@ -1306,6 +1314,7 @@ Passed: 14
 |3821B1PE3|Musaev_Ilgar|**9/9**|
 |3821B1PE3|nedelin_dmitry|**9/9**|
 |3821B1PE3|smirnov_pavel|**9/9**|
+
 Passed: 4
 
 **Total Passed: 81**
