@@ -1040,6 +1040,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE1|kriseev_mikhail|0.1326|
 |3821B1PE1|morgachev_stepan|0.1331|
 |3821B1FI3|simonyan_suren|0.1332|
+|3821B1PE2|dostavalov_semyon|0.1344|
 |3821B1FI2|soloninko_andrey|0.1346|
 |3821B1FI2|kazantsev_evgeny|0.1365|
 |3821B1FI3|kulaev_zhenya|0.1375|
@@ -1108,7 +1109,6 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE2|savchuk_anton|0.3804|
 |3821B1FI1|bonyuk_peter|BUILD FAILED|
 |3821B1PE2|derun_andrei|RUN FAILED|
-|3821B1PE2|dostavalov_semyon|BUILD FAILED|
 
 ## 9_gelu_ocl (134217728 elements)
 |Group|Name|Result|
@@ -1298,7 +1298,7 @@ Passed: 21
 |3821B1PE2|bakhtiarov_alexander|**9/9**|
 |3821B1PE2|belan_vadim|**9/9**|
 |3821B1PE2|derun_andrei|1/9|
-|3821B1PE2|dostavalov_semyon|8/9|
+|3821B1PE2|dostavalov_semyon|**9/9**|
 |3821B1PE2|filatov_maxim|**9/9**|
 |3821B1PE2|gontsov_roman|**9/9**|
 |3821B1PE2|karagodin_andrey|**9/9**|
@@ -1312,7 +1312,7 @@ Passed: 21
 |3821B1PE2|vinokurov_ivan|**9/9**|
 |3821B1PE2|zhatkin_vyacheslav|**9/9**|
 
-Passed: 14
+Passed: 15
 
 ## 3821B1PE3
 |Group|Name|Passed|
@@ -1326,4 +1326,4 @@ Passed: 14
 
 Passed: 4
 
-**Total Passed: 81**
+**Total Passed: 82**
