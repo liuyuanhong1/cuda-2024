@@ -743,6 +743,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI3|lebedeva_ksenia|0.5576|
 |3821B1FI3|kulagin_aleksandr|0.5823|
 |3821B1PE2|derun_andrei|1.0889|
+|3821B1FI2|zawadowski_jan|1.2661|
 
 ## 5_block_gemm_omp (1024 elements)
 |Group|Name|Result|
@@ -1203,7 +1204,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1FI2|soloninko_andrey|**9/9**|
 |3821B1FI2|travin_maksim|**9/9**|
 |3821B1FI2|zakharov_artem|**9/9**|
-|3821B1FI2|zawadowski_jan|2/9|
+|3821B1FI2|zawadowski_jan|3/9|
 
 ## 3821B1FI3
 |Group|Name|Passed|
