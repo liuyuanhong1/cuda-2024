@@ -1,4 +1,0 @@
-/home/crazyproger/sandbox/cuda-2024/3821B1PE2/2_gelu_cuda/dostavalov_semyon/gelu_cuda.cu:10:10: fatal error: activation_cuda.h: No such file or directory
-   10 | #include "activation_cuda.h"
-      |          ^~~~~~~~~~~~~~~~~~~
-compilation terminated.
