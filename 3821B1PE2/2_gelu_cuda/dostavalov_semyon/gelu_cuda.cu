@@ -21,7 +21,7 @@ __global__ void ActivationKernel(const float* input_data, float* output_data, si
 	output_data[idx] = val * (1.0f - 1.0f / (1.0f + __expf(val * (alpha + val * val * beta))));
 }
 
-std::vector<float> GeluCuda(const std::vector<float>& input_data) {
+std::vector<float> GeluCUDA(const std::vector<float>& input_data) {
 	if (input_data.empty()) return {};
 
 	cudaDeviceProp device_properties;
