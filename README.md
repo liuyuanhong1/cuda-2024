@@ -580,6 +580,7 @@ std::vector<float> GeluOCL(const std::vector<float>& input) {
 |3821B1PE2|filatov_maxim|0.0968|
 |3821B1PE2|novostroev_ivan|0.0970|
 |3821B1FI1|shipitsin_alex|0.0973|
+|3821B1PE2|dostavalov_semyon|0.0990|
 |3821B1PE2|gontsov_roman|0.0993|
 |3821B1PE2|nikitin_kirill|0.0999|
 |3821B1PE2|kochetov_nikolay|0.1000|
@@ -1289,7 +1290,7 @@ Passed: 21
 |3821B1PE2|bakhtiarov_alexander|**9/9**|
 |3821B1PE2|belan_vadim|**9/9**|
 |3821B1PE2|derun_andrei|1/9|
-|3821B1PE2|dostavalov_semyon|1/9|
+|3821B1PE2|dostavalov_semyon|2/9|
 |3821B1PE2|filatov_maxim|**9/9**|
 |3821B1PE2|gontsov_roman|**9/9**|
 |3821B1PE2|karagodin_andrey|**9/9**|
