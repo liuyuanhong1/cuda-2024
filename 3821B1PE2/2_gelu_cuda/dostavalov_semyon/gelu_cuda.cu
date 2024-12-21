@@ -7,7 +7,7 @@
 #include "cuda.h"
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
-#include "activation_cuda.h"
+#include "gelu_cuda.h"
 
 __global__ void ActivationKernel(const float* input_data, float* output_data, size_t length) {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
